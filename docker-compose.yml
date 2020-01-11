@@ -1,0 +1,20 @@
+version: "3"
+
+services:
+  sqs-reader:
+    build: SqsReader/src/SqsReader
+    ports:
+      - 5200:5200
+    environment:
+      - AwsRegion
+      - AwsAccessKey
+      - AwsSecretKey
+
+  sqs-writer:
+    build: SqsWriter/src/SqsWriter
+    ports:
+      - 5100:5100
+    environment:
+      - AwsRegion
+      - AwsAccessKey
+      - AwsSecretKey
