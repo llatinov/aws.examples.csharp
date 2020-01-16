@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,14 +14,14 @@ namespace SqsWriter.Sqs
 {
     public class SqsClient : ISqsClient
     {
-        private readonly AppConfig.AwsConfig _awsConfig;
+        private readonly AppConfig _appConfig;
         private readonly IAmazonSQS _sqsClient;
         private readonly ILogger<SqsClient> _logger;
         private readonly ConcurrentDictionary<string, string> _queueUrlCache;
 
         public SqsClient(IOptions<AppConfig> awsConfig, IAmazonSQS sqsClient, ILogger<SqsClient> logger)
         {
-            _awsConfig = awsConfig.Value.AwsSettings;
+            _appConfig = awsConfig.Value;
             _sqsClient = sqsClient;
             _logger = logger;
             _queueUrlCache = new ConcurrentDictionary<string, string>();
@@ -30,7 +29,7 @@ namespace SqsWriter.Sqs
 
         public string GetQueueName()
         {
-            return _awsConfig.QueueName;
+            return _appConfig.AwsQueueName;
         }
 
         public async Task CreateQueue()
@@ -40,14 +39,14 @@ namespace SqsWriter.Sqs
             try
             {
                 var createQueueRequest = new CreateQueueRequest();
-                if (_awsConfig.IsFifo)
+                if (_appConfig.AwsQueueIsFifo)
                 {
                     createQueueRequest.Attributes.Add("FifoQueue", "true");
                 }
 
-                createQueueRequest.QueueName = _awsConfig.QueueName;
+                createQueueRequest.QueueName = _appConfig.AwsQueueName;
                 var createQueueResponse = await _sqsClient.CreateQueueAsync(createQueueRequest);
-                createQueueRequest.QueueName = _awsConfig.DeadLetterQueueName;
+                createQueueRequest.QueueName = _appConfig.AwsDeadLetterQueueName;
                 var createDeadLetterQueueResponse = await _sqsClient.CreateQueueAsync(createQueueRequest);
 
                 // Get the the ARN of dead letter queue and configure main queue to deliver messages to it
@@ -71,19 +70,19 @@ namespace SqsWriter.Sqs
                     {
                         {"RedrivePolicy", JsonConvert.SerializeObject(redrivePolicy)},
                         // Enable Long polling
-                        {"ReceiveMessageWaitTimeSeconds", _awsConfig.LongPollTimeSeconds.ToString()}
+                        {"ReceiveMessageWaitTimeSeconds", _appConfig.AwsQueueLongPollTimeSeconds.ToString()}
                     }
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error when creating SQS queue {_awsConfig.QueueName} and {_awsConfig.DeadLetterQueueName}");
+                _logger.LogError(ex, $"Error when creating SQS queue {_appConfig.AwsQueueName} and {_appConfig.AwsDeadLetterQueueName}");
             }
         }
 
         public async Task<SqsStatus> GetQueueStatus()
         {
-            var queueName = _awsConfig.QueueName;
+            var queueName = _appConfig.AwsQueueName;
             var queueUrl = await GetQueueUrl(queueName);
 
             try
@@ -94,9 +93,9 @@ namespace SqsWriter.Sqs
                 return new SqsStatus
                 {
                     IsHealthy = response.HttpStatusCode == HttpStatusCode.OK,
-                    Region = _awsConfig.AwsRegion,
+                    Region = _appConfig.AwsRegion,
                     QueueName = queueName,
-                    LongPollTimeSeconds = _awsConfig.LongPollTimeSeconds,
+                    LongPollTimeSeconds = _appConfig.AwsQueueLongPollTimeSeconds,
                     ApproximateNumberOfMessages = response.ApproximateNumberOfMessages,
                     ApproximateNumberOfMessagesNotVisible = response.ApproximateNumberOfMessagesNotVisible,
                     LastModifiedTimestamp = response.LastModifiedTimestamp
@@ -118,7 +117,7 @@ namespace SqsWriter.Sqs
                 var response = await _sqsClient.ReceiveMessageAsync(new ReceiveMessageRequest
                 {
                     QueueUrl = queueUrl,
-                    WaitTimeSeconds = _awsConfig.LongPollTimeSeconds,
+                    WaitTimeSeconds = _appConfig.AwsQueueLongPollTimeSeconds,
                     AttributeNames = new List<string> { "ApproximateReceiveCount" },
                     MessageAttributeNames = new List<string> { "*" }
                 }, cancellationToken);
@@ -144,10 +143,10 @@ namespace SqsWriter.Sqs
 
         public async Task<List<Message>> GetMessagesAsync(CancellationToken cancellationToken = default)
         {
-            return await GetMessagesAsync(_awsConfig.QueueName, cancellationToken);
+            return await GetMessagesAsync(_appConfig.AwsQueueName, cancellationToken);
         }
 
-        public async Task PostMessageAsync(string queueName, string messageBody, string messageType)
+        public async Task PostMessageAsync<T>(string queueName, T message)
         {
             var queueUrl = await GetQueueUrl(queueName);
 
@@ -156,21 +155,21 @@ namespace SqsWriter.Sqs
                 var sendMessageRequest = new SendMessageRequest
                 {
                     QueueUrl = queueUrl,
-                    MessageBody = messageBody,
+                    MessageBody = JsonConvert.SerializeObject(message),
                     MessageAttributes = new Dictionary<string, MessageAttributeValue>
                     {
                         {
                             MessageAttributes.MessageType, new MessageAttributeValue
                             {
                                 DataType = nameof(String),
-                                StringValue = messageType
+                                StringValue = typeof(T).Name
                             }
                         }
                     }
                 };
-                if (_awsConfig.IsFifo)
+                if (_appConfig.AwsQueueIsFifo)
                 {
-                    sendMessageRequest.MessageGroupId = messageType;
+                    sendMessageRequest.MessageGroupId = typeof(T).Name;
                     sendMessageRequest.MessageDeduplicationId = Guid.NewGuid().ToString();
                 }
 
@@ -183,68 +182,9 @@ namespace SqsWriter.Sqs
             }
         }
 
-        public async Task PostMessageAsync(string messageBody, string messageType)
+        public async Task PostMessageAsync<T>(T message)
         {
-            await PostMessageAsync(_awsConfig.QueueName, messageBody, messageType);
-        }
-
-        public async Task DeleteMessageAsync(string queueName, string receiptHandle)
-        {
-            var queueUrl = await GetQueueUrl(queueName);
-
-            try
-            {
-                var response = await _sqsClient.DeleteMessageAsync(queueUrl, receiptHandle);
-
-                if (response.HttpStatusCode != HttpStatusCode.OK)
-                {
-                    throw new AmazonSQSException($"Failed to DeleteMessageAsync with for [{receiptHandle}] from queue '{queueName}'. Response: {response.HttpStatusCode}");
-                }
-            }
-            catch (Exception)
-            {
-                _logger.LogError($"Failed to DeleteMessageAsync from queue {queueName}");
-                throw;
-            }
-        }
-
-        public async Task DeleteMessageAsync(string receiptHandle)
-        {
-            await DeleteMessageAsync(_awsConfig.QueueName, receiptHandle);
-        }
-
-        public async Task RestoreFromDeadLetterQueue(CancellationToken cancellationToken = default)
-        {
-            var deadLetterQueueName = _awsConfig.DeadLetterQueueName;
-
-            try
-            {
-                var token = new CancellationTokenSource();
-                while (!token.Token.IsCancellationRequested)
-                {
-                    var messages = await GetMessagesAsync(deadLetterQueueName, cancellationToken);
-                    if (!messages.Any())
-                    {
-                        token.Cancel();
-                        continue;
-                    }
-
-                    messages.ForEach(async message =>
-                    {
-                        var messageType = message.MessageAttributes.GetMessageType();
-                        if (messageType != null)
-                        {
-                            await PostMessageAsync(message.Body, messageType);
-                            await DeleteMessageAsync(deadLetterQueueName, message.ReceiptHandle);
-                        }
-                    });
-                }
-            }
-            catch (Exception)
-            {
-                _logger.LogError($"Failed to ReprocessMessages from queue {deadLetterQueueName}");
-                throw;
-            }
+            await PostMessageAsync(_appConfig.AwsQueueName, message);
         }
 
         private async Task<string> GetQueueUrl(string queueName)

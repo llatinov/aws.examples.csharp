@@ -4,10 +4,10 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Serilog;
 using SqsWriter.HealthChecks;
 using SqsWriter.Middleware;
 using SqsWriter.Sqs;
-using Serilog;
 
 namespace SqsWriter
 {
@@ -17,12 +17,10 @@ namespace SqsWriter
         public Startup()
         {
             var configurationBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
             Configuration = configurationBuilder.Build();
             Configuration.Bind(_appConfig);
-            _appConfig.AwsSettings.UpdateFromEnvironment();
         }
 
         public IConfiguration Configuration { get; }
@@ -33,16 +31,13 @@ namespace SqsWriter
                 .AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
             services.Configure<AppConfig>(Configuration);
             services.AddLogging(x => x.AddFilter("Microsoft", LogLevel.Warning));
-            services.AddSingleton<IAmazonSQS>(x => SqsClientFactory.CreateClient(_appConfig.AwsSettings));
+            services.AddSingleton<IAmazonSQS>(x => SqsClientFactory.CreateClient(_appConfig));
             services.AddSingleton<ISqsClient, SqsClient>();
             services.AddHealthChecks()
                 .AddCheck<SqsHealthCheck>("SQS Health Check");
         }
 
-        public void Configure(
-            IApplicationBuilder app
-            , ISqsClient sqsClient
-            )
+        public void Configure(IApplicationBuilder app, ISqsClient sqsClient)
         {
             app.UseSerilogRequestLogging();
             app.UseMiddleware<HttpExceptionMiddleware>();
@@ -53,7 +48,7 @@ namespace SqsWriter
                 endpoints.MapCustomHealthChecks("SqsWriter service");
             });
 
-            if (_appConfig.AwsSettings.AutomaticallyCreateQueue)
+            if (_appConfig.AwsQueueAutomaticallyCreate)
             {
                 sqsClient.CreateQueue().Wait();
             }

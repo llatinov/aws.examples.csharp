@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using SqsWriter.Controllers;
@@ -13,12 +14,14 @@ namespace SqsWriter.Test.Controllers
     {
         private PublishController _publishControllerUnderTest;
         private Mock<ISqsClient> _sqsClientMock;
+        private Mock<ILogger<PublishController>> _loggerMock;
 
         [TestInitialize]
         public void Setup()
         {
             _sqsClientMock = new Mock<ISqsClient>();
-            _publishControllerUnderTest = new PublishController(_sqsClientMock.Object);
+            _loggerMock = new Mock<ILogger<PublishController>>();
+            _publishControllerUnderTest = new PublishController(_sqsClientMock.Object, _loggerMock.Object);
         }
 
         [TestMethod]

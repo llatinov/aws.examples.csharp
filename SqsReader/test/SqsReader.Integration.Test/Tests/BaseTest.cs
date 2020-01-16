@@ -2,10 +2,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Serilog;
 using SqsReader.Integration.Test.Client;
 using SqsReader.Services;
 using SqsReader.Sqs;
-using Serilog;
 
 namespace SqsReader.Integration.Test.Tests
 {

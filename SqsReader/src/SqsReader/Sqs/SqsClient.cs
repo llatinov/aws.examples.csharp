@@ -15,14 +15,14 @@ namespace SqsReader.Sqs
 {
     public class SqsClient : ISqsClient
     {
-        private readonly AppConfig.AwsConfig _awsConfig;
+        private readonly AppConfig _appConfig;
         private readonly IAmazonSQS _sqsClient;
         private readonly ILogger<SqsClient> _logger;
         private readonly ConcurrentDictionary<string, string> _queueUrlCache;
 
         public SqsClient(IOptions<AppConfig> awsConfig, IAmazonSQS sqsClient, ILogger<SqsClient> logger)
         {
-            _awsConfig = awsConfig.Value.AwsSettings;
+            _appConfig = awsConfig.Value;
             _sqsClient = sqsClient;
             _logger = logger;
             _queueUrlCache = new ConcurrentDictionary<string, string>();
@@ -30,7 +30,7 @@ namespace SqsReader.Sqs
 
         public string GetQueueName()
         {
-            return _awsConfig.QueueName;
+            return _appConfig.AwsQueueName;
         }
 
         public async Task CreateQueue()
@@ -40,14 +40,14 @@ namespace SqsReader.Sqs
             try
             {
                 var createQueueRequest = new CreateQueueRequest();
-                if (_awsConfig.IsFifo)
+                if (_appConfig.AwsQueueIsFifo)
                 {
                     createQueueRequest.Attributes.Add("FifoQueue", "true");
                 }
 
-                createQueueRequest.QueueName = _awsConfig.QueueName;
+                createQueueRequest.QueueName = _appConfig.AwsQueueName;
                 var createQueueResponse = await _sqsClient.CreateQueueAsync(createQueueRequest);
-                createQueueRequest.QueueName = _awsConfig.DeadLetterQueueName;
+                createQueueRequest.QueueName = _appConfig.AwsDeadLetterQueueName;
                 var createDeadLetterQueueResponse = await _sqsClient.CreateQueueAsync(createQueueRequest);
 
                 // Get the the ARN of dead letter queue and configure main queue to deliver messages to it
@@ -71,19 +71,19 @@ namespace SqsReader.Sqs
                     {
                         {"RedrivePolicy", JsonConvert.SerializeObject(redrivePolicy)},
                         // Enable Long polling
-                        {"ReceiveMessageWaitTimeSeconds", _awsConfig.LongPollTimeSeconds.ToString()}
+                        {"ReceiveMessageWaitTimeSeconds", _appConfig.AwsQueueLongPollTimeSeconds.ToString()}
                     }
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error when creating SQS queue {_awsConfig.QueueName} and {_awsConfig.DeadLetterQueueName}");
+                _logger.LogError(ex, $"Error when creating SQS queue {_appConfig.AwsQueueName} and {_appConfig.AwsDeadLetterQueueName}");
             }
         }
 
         public async Task<SqsStatus> GetQueueStatus()
         {
-            var queueName = _awsConfig.QueueName;
+            var queueName = _appConfig.AwsQueueName;
             var queueUrl = await GetQueueUrl(queueName);
 
             try
@@ -94,9 +94,9 @@ namespace SqsReader.Sqs
                 return new SqsStatus
                 {
                     IsHealthy = response.HttpStatusCode == HttpStatusCode.OK,
-                    Region = _awsConfig.AwsRegion,
+                    Region = _appConfig.AwsRegion,
                     QueueName = queueName,
-                    LongPollTimeSeconds = _awsConfig.LongPollTimeSeconds,
+                    LongPollTimeSeconds = _appConfig.AwsQueueLongPollTimeSeconds,
                     ApproximateNumberOfMessages = response.ApproximateNumberOfMessages,
                     ApproximateNumberOfMessagesNotVisible = response.ApproximateNumberOfMessagesNotVisible,
                     LastModifiedTimestamp = response.LastModifiedTimestamp
@@ -118,7 +118,7 @@ namespace SqsReader.Sqs
                 var response = await _sqsClient.ReceiveMessageAsync(new ReceiveMessageRequest
                 {
                     QueueUrl = queueUrl,
-                    WaitTimeSeconds = _awsConfig.LongPollTimeSeconds,
+                    WaitTimeSeconds = _appConfig.AwsQueueLongPollTimeSeconds,
                     AttributeNames = new List<string> { "ApproximateReceiveCount" },
                     MessageAttributeNames = new List<string> { "*" }
                 }, cancellationToken);
@@ -144,7 +144,7 @@ namespace SqsReader.Sqs
 
         public async Task<List<Message>> GetMessagesAsync(CancellationToken cancellationToken = default)
         {
-            return await GetMessagesAsync(_awsConfig.QueueName, cancellationToken);
+            return await GetMessagesAsync(_appConfig.AwsQueueName, cancellationToken);
         }
 
         public async Task PostMessageAsync(string queueName, string messageBody, string messageType)
@@ -168,7 +168,7 @@ namespace SqsReader.Sqs
                         }
                     }
                 };
-                if (_awsConfig.IsFifo)
+                if (_appConfig.AwsQueueIsFifo)
                 {
                     sendMessageRequest.MessageGroupId = messageType;
                     sendMessageRequest.MessageDeduplicationId = Guid.NewGuid().ToString();
@@ -185,7 +185,7 @@ namespace SqsReader.Sqs
 
         public async Task PostMessageAsync(string messageBody, string messageType)
         {
-            await PostMessageAsync(_awsConfig.QueueName, messageBody, messageType);
+            await PostMessageAsync(_appConfig.AwsQueueName, messageBody, messageType);
         }
 
         public async Task DeleteMessageAsync(string queueName, string receiptHandle)
@@ -210,12 +210,12 @@ namespace SqsReader.Sqs
 
         public async Task DeleteMessageAsync(string receiptHandle)
         {
-            await DeleteMessageAsync(_awsConfig.QueueName, receiptHandle);
+            await DeleteMessageAsync(_appConfig.AwsQueueName, receiptHandle);
         }
 
         public async Task RestoreFromDeadLetterQueue(CancellationToken cancellationToken = default)
         {
-            var deadLetterQueueName = _awsConfig.DeadLetterQueueName;
+            var deadLetterQueueName = _appConfig.AwsDeadLetterQueueName;
 
             try
             {

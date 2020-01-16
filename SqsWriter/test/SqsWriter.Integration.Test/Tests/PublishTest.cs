@@ -35,8 +35,7 @@ namespace SqsWriter.Integration.Test.Tests
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
             SqsClientMock.Verify(x => x.PostMessageAsync(
-                It.Is<string>(y => y == JsonConvert.SerializeObject(movie)),
-                It.Is<string>(y => y == "Movie")), Times.Once);
+                It.Is<Movie>(y => JsonConvert.SerializeObject(y) == JsonConvert.SerializeObject(movie))), Times.Once);
         }
 
         [TestMethod]
@@ -47,8 +46,7 @@ namespace SqsWriter.Integration.Test.Tests
 
             Assert.AreEqual(HttpStatusCode.Created, response.StatusCode);
             SqsClientMock.Verify(x => x.PostMessageAsync(
-                It.Is<string>(y => y == JsonConvert.SerializeObject(actor)),
-                It.Is<string>(y => y == "Actor")), Times.Once);
+                It.Is<Actor>(y => JsonConvert.SerializeObject(y) == JsonConvert.SerializeObject(actor))), Times.Once);
         }
     }
 }

@@ -5,7 +5,7 @@ namespace SqsWriter.Sqs
 {
     public class SqsClientFactory
     {
-        public static AmazonSQSClient CreateClient(AppConfig.AwsConfig awsConfig)
+        public static AmazonSQSClient CreateClient(AppConfig awsConfig)
         {
             var sqsConfig = new AmazonSQSConfig
             {

@@ -15,10 +15,6 @@ namespace SqsWriter.Sqs
 
         Task<List<Message>> GetMessagesAsync(CancellationToken cancellationToken = default);
 
-        Task PostMessageAsync(string messageBody, string messageType);
-
-        Task DeleteMessageAsync(string receiptHandle);
-
-        Task RestoreFromDeadLetterQueue(CancellationToken cancellationToken = default);
+        Task PostMessageAsync<T>(T message);
     }
 }

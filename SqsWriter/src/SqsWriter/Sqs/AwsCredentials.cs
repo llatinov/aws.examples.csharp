@@ -4,16 +4,16 @@ namespace SqsWriter.Sqs
 {
     public class AwsCredentials : AWSCredentials
     {
-        private readonly AppConfig.AwsConfig _awsConfig;
+        private readonly AppConfig _appConfig;
 
-        public AwsCredentials(AppConfig.AwsConfig awsConfig)
+        public AwsCredentials(AppConfig appConfig)
         {
-            _awsConfig = awsConfig;
+            _appConfig = appConfig;
         }
 
         public override ImmutableCredentials GetCredentials()
         {
-            return new ImmutableCredentials(_awsConfig.AwsAccessKey, _awsConfig.AwsSecretKey, null);
+            return new ImmutableCredentials(_appConfig.AwsAccessKey, _appConfig.AwsSecretKey, null);
         }
     }
 }

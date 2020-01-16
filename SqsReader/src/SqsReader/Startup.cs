@@ -4,12 +4,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Serilog;
 using SqsReader.HealthChecks;
-using SqsReader.Middleware;
 using SqsReader.Services;
 using SqsReader.Services.Processors;
 using SqsReader.Sqs;
-using Serilog;
 
 namespace SqsReader
 {
@@ -19,12 +18,10 @@ namespace SqsReader
         public Startup()
         {
             var configurationBuilder = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
                 .AddEnvironmentVariables();
 
             Configuration = configurationBuilder.Build();
             Configuration.Bind(_appConfig);
-            _appConfig.AwsSettings.UpdateFromEnvironment();
         }
 
         public IConfiguration Configuration { get; }
@@ -35,7 +32,7 @@ namespace SqsReader
                 .AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
             services.Configure<AppConfig>(Configuration);
             services.AddLogging(x => x.AddFilter("Microsoft", LogLevel.Warning));
-            services.AddSingleton<IAmazonSQS>(x => SqsClientFactory.CreateClient(_appConfig.AwsSettings));
+            services.AddSingleton<IAmazonSQS>(x => SqsClientFactory.CreateClient(_appConfig));
             services.AddSingleton<ISqsClient, SqsClient>();
             services.AddSingleton<ISqsConsumerService, SqsConsumerService>();
             services.AddScoped<IMessageProcessor, ActorMessageProcessor>();
@@ -44,14 +41,9 @@ namespace SqsReader
                 .AddCheck<SqsHealthCheck>("SQS Health Check");
         }
 
-        public void Configure(
-            IApplicationBuilder app
-            , ISqsClient sqsClient
-            , ISqsConsumerService sqsConsumerService
-            )
+        public void Configure(IApplicationBuilder app, ISqsClient sqsClient, ISqsConsumerService sqsConsumerService)
         {
             app.UseSerilogRequestLogging();
-            app.UseMiddleware<HttpExceptionMiddleware>();
             app.UseRouting();
             app.UseEndpoints(endpoints =>
             {
@@ -59,7 +51,7 @@ namespace SqsReader
                 endpoints.MapCustomHealthChecks("SqsReader service");
             });
 
-            if (_appConfig.AwsSettings.AutomaticallyCreateQueue)
+            if (_appConfig.AwsQueueAutomaticallyCreate)
             {
                 sqsClient.CreateQueue().Wait();
             }

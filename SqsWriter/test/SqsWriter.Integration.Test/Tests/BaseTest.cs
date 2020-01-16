@@ -2,9 +2,9 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Serilog;
 using SqsWriter.Integration.Test.Client;
 using SqsWriter.Sqs;
-using Serilog;
 
 namespace SqsWriter.Integration.Test.Tests
 {
