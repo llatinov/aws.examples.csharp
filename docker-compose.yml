@@ -9,6 +9,10 @@ services:
       - AwsRegion
       - AwsAccessKey
       - AwsSecretKey
+      - AwsQueueName
+      - AwsQueueIsFifo
+      - AwsQueueLongPollTimeSeconds
+      - AwsQueueAutomaticallyCreate
 
   sqs-writer:
     build: SqsWriter/src/SqsWriter
@@ -18,3 +22,7 @@ services:
       - AwsRegion
       - AwsAccessKey
       - AwsSecretKey
+      - AwsQueueName
+      - AwsQueueIsFifo
+      - AwsQueueLongPollTimeSeconds
+      - AwsQueueAutomaticallyCreate

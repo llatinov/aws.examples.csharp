@@ -5,12 +5,12 @@ namespace SqsReader.Services
 {
     public interface ISqsConsumerService
     {
-        Task<SqsStatus> GetStatus();
+        Task<SqsStatus> GetStatusAsync();
 
-        void StartConsuming();
+        Task StartConsumingAsync();
 
-        void StopConsuming();
+        Task StopConsumingAsync();
 
-        Task ReprocessMessages();
+        Task ReprocessMessagesAsync();
     }
 }

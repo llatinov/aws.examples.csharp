@@ -1,4 +1,5 @@
-﻿using Amazon.SQS.Model;
+﻿using System.Threading.Tasks;
+using Amazon.SQS.Model;
 using Microsoft.Extensions.Logging;
 using SqsReader.Sqs.Models;
 
@@ -18,9 +19,10 @@ namespace SqsReader.Services.Processors
             return messageType == typeof(Movie).Name;
         }
 
-        public void Process(Message message)
+        public Task ProcessAsync(Message message)
         {
             _logger.LogInformation($"MovieMessageProcessor invoked with: {message.Body}");
+            return Task.CompletedTask;
         }
     }
 }

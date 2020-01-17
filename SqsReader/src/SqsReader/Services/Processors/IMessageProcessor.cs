@@ -1,4 +1,5 @@
-﻿using Amazon.SQS.Model;
+﻿using System.Threading.Tasks;
+using Amazon.SQS.Model;
 
 namespace SqsReader.Services.Processors
 {
@@ -6,6 +7,6 @@ namespace SqsReader.Services.Processors
     {
         bool CanProcess(string messageType);
 
-        void Process(Message message);
+        Task ProcessAsync(Message message);
     }
 }

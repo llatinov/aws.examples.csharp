@@ -12,39 +12,39 @@ namespace SqsReader.Test.Controllers
     public class ConsumerControllerTest
     {
         [Theory, AutoNSubstituteData]
-        public void Start_ReturnsCorrectResult_AndCallsCorrectMethod(
+        public async Task Start_ReturnsCorrectResult_AndCallsCorrectMethod(
             [Frozen] ISqsConsumerService consumerServiceMock,
             ConsumerController controllerUnderTest)
         {
-            var result = controllerUnderTest.Start();
+            var result = await controllerUnderTest.Start();
             var asObjectResult = (StatusCodeResult)result;
 
             Assert.Equal(200, asObjectResult.StatusCode);
-            consumerServiceMock.Received().StartConsuming();
+            await consumerServiceMock.Received().StartConsumingAsync();
         }
 
         [Theory, AutoNSubstituteData]
-        public void Stop_ReturnsCorrectResult_AndCallsCorrectMethod(
+        public async Task Stop_ReturnsCorrectResult_AndCallsCorrectMethod(
             [Frozen] ISqsConsumerService consumerServiceMock,
             ConsumerController controllerUnderTest)
         {
-            var result = controllerUnderTest.Stop();
+            var result = await controllerUnderTest.Stop();
             var asObjectResult = (StatusCodeResult)result;
 
             Assert.Equal(200, asObjectResult.StatusCode);
-            consumerServiceMock.Received().StopConsuming();
+            await consumerServiceMock.Received().StopConsumingAsync();
         }
 
         [Theory, AutoNSubstituteData]
-        public void Reprocess_ReturnsCorrectResult_AndCallsCorrectMethod(
+        public async Task Reprocess_ReturnsCorrectResult_AndCallsCorrectMethod(
             [Frozen] ISqsConsumerService consumerServiceMock,
             ConsumerController controllerUnderTest)
         {
-            var result = controllerUnderTest.Reprocess();
+            var result = await controllerUnderTest.Reprocess();
             var asObjectResult = (StatusCodeResult)result;
 
             Assert.Equal(200, asObjectResult.StatusCode);
-            consumerServiceMock.Received().ReprocessMessages();
+            await consumerServiceMock.Received().ReprocessMessagesAsync();
         }
 
         [Theory, AutoNSubstituteData]
@@ -53,7 +53,7 @@ namespace SqsReader.Test.Controllers
             ConsumerController controllerUnderTest)
         {
             var sqsStatus = new SqsStatus();
-            consumerServiceMock.GetStatus().Returns(sqsStatus);
+            consumerServiceMock.GetStatusAsync().Returns(sqsStatus);
 
             var result = await controllerUnderTest.Status();
             var asObjectResult = (ObjectResult)result;
@@ -61,7 +61,7 @@ namespace SqsReader.Test.Controllers
 
             Assert.Equal(200, asObjectResult.StatusCode);
             Assert.Equal(sqsStatus, asObjectValue);
-            await consumerServiceMock.Received().GetStatus();
+            await consumerServiceMock.Received().GetStatusAsync();
         }
     }
 }

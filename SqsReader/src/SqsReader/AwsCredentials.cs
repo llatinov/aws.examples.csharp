@@ -1,6 +1,6 @@
 ﻿using Amazon.Runtime;
 
-namespace SqsReader.Sqs
+namespace SqsReader
 {
     public class AwsCredentials : AWSCredentials
     {

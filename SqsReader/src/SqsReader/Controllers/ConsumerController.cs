@@ -17,25 +17,25 @@ namespace SqsReader.Controllers
 
         [HttpPost]
         [Route("start")]
-        public IActionResult Start()
+        public async Task<IActionResult> Start()
         {
-            _sqsConsumerService.StartConsuming();
+            await _sqsConsumerService.StartConsumingAsync();
             return StatusCode((int)HttpStatusCode.OK);
         }
 
         [HttpPost]
         [Route("stop")]
-        public IActionResult Stop()
+        public async Task<IActionResult> Stop()
         {
-            _sqsConsumerService.StopConsuming();
+            await _sqsConsumerService.StopConsumingAsync();
             return StatusCode((int)HttpStatusCode.OK);
         }
 
         [HttpPost]
         [Route("reprocess")]
-        public IActionResult Reprocess()
+        public async Task<IActionResult> Reprocess()
         {
-            _sqsConsumerService.ReprocessMessages();
+            await _sqsConsumerService.ReprocessMessagesAsync();
             return StatusCode((int)HttpStatusCode.OK);
         }
 
@@ -43,7 +43,7 @@ namespace SqsReader.Controllers
         [Route("status")]
         public async Task<IActionResult> Status()
         {
-            var status = await _sqsConsumerService.GetStatus();
+            var status = await _sqsConsumerService.GetStatusAsync();
             return StatusCode((int)HttpStatusCode.OK, status);
         }
     }

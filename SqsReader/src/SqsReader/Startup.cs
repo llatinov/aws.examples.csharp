@@ -1,3 +1,5 @@
+using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
 using Amazon.SQS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -5,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Serilog;
+using SqsReader.Dynamo;
 using SqsReader.HealthChecks;
 using SqsReader.Services;
 using SqsReader.Services.Processors;
@@ -32,16 +35,27 @@ namespace SqsReader
                 .AddNewtonsoftJson(options => options.SerializerSettings.NullValueHandling = NullValueHandling.Ignore);
             services.Configure<AppConfig>(Configuration);
             services.AddLogging(x => x.AddFilter("Microsoft", LogLevel.Warning));
+
             services.AddSingleton<IAmazonSQS>(x => SqsClientFactory.CreateClient(_appConfig));
             services.AddSingleton<ISqsClient, SqsClient>();
             services.AddSingleton<ISqsConsumerService, SqsConsumerService>();
+
+            services.AddSingleton<IAmazonDynamoDB>(x => DynamoDbClientFactory.CreateClient(_appConfig));
+            services.AddSingleton<IDatabaseClient, DatabaseClient>();
+            services.AddSingleton<IActorsRepository, ActorsRepository>();
+
             services.AddScoped<IMessageProcessor, ActorMessageProcessor>();
             services.AddScoped<IMessageProcessor, MovieMessageProcessor>();
+
             services.AddHealthChecks()
                 .AddCheck<SqsHealthCheck>("SQS Health Check");
         }
 
-        public void Configure(IApplicationBuilder app, ISqsClient sqsClient, ISqsConsumerService sqsConsumerService)
+        public async void Configure(
+            IApplicationBuilder app,
+            ISqsClient sqsClient,
+            ISqsConsumerService sqsConsumerService,
+            IActorsRepository actorsRepository)
         {
             app.UseSerilogRequestLogging();
             app.UseRouting();
@@ -53,9 +67,11 @@ namespace SqsReader
 
             if (_appConfig.AwsQueueAutomaticallyCreate)
             {
-                sqsClient.CreateQueue().Wait();
+                await sqsClient.CreateQueue();
             }
-            sqsConsumerService.StartConsuming();
+
+            await sqsConsumerService.StartConsumingAsync();
+            await actorsRepository.CreateTableAsync();
         }
     }
 }

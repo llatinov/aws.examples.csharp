@@ -25,7 +25,7 @@ namespace SqsReader.Services
             _logger = logger;
         }
 
-        public async Task<SqsStatus> GetStatus()
+        public async Task<SqsStatus> GetStatusAsync()
         {
             var status = await _sqsClient.GetQueueStatus();
             status.IsConsuming = IsConsuming();
@@ -33,21 +33,27 @@ namespace SqsReader.Services
             return status;
         }
 
-        public void StartConsuming()
+        public async Task StartConsumingAsync()
         {
             if (IsConsuming())
                 return;
 
             _tokenSource = new CancellationTokenSource();
-            ProcessAsync();
+            await ProcessAsync();
         }
 
-        public void StopConsuming()
+        public Task StopConsumingAsync()
         {
-            if (!IsConsuming())
-                return;
+            if (IsConsuming())
+            {
+                _tokenSource.Cancel();
+            }
+            return Task.CompletedTask;
+        }
 
-            _tokenSource.Cancel();
+        public async Task ReprocessMessagesAsync()
+        {
+            await _sqsClient.RestoreFromDeadLetterQueue();
         }
 
         private bool IsConsuming()
@@ -55,14 +61,14 @@ namespace SqsReader.Services
             return _tokenSource != null && !_tokenSource.Token.IsCancellationRequested;
         }
 
-        private async void ProcessAsync()
+        private async Task ProcessAsync()
         {
             try
             {
                 while (!_tokenSource.Token.IsCancellationRequested)
                 {
                     var messages = await _sqsClient.GetMessagesAsync(_tokenSource.Token);
-                    messages.ForEach(ProcessMessage);
+                    messages.ForEach(async x => await ProcessMessageAsync(x));
                 }
             }
             catch (OperationCanceledException)
@@ -71,7 +77,7 @@ namespace SqsReader.Services
             }
         }
 
-        private async void ProcessMessage(Message message)
+        private async Task ProcessMessageAsync(Message message)
         {
             try
             {
@@ -87,18 +93,13 @@ namespace SqsReader.Services
                     throw new Exception($"No processor found for message type '{messageType.StringValue}'");
                 }
 
-                processor.Process(message);
+                await processor.ProcessAsync(message);
                 await _sqsClient.DeleteMessageAsync(message.ReceiptHandle);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Cannot process message [id: {message.MessageId}, receiptHandle: {message.ReceiptHandle}, body: {message.Body}] from queue {_sqsClient.GetQueueName()}");
             }
-        }
-
-        public async Task ReprocessMessages()
-        {
-            await _sqsClient.RestoreFromDeadLetterQueue();
         }
     }
 }
