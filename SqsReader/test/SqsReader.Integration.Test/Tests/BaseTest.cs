@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -9,11 +10,11 @@ using SqsReader.Sqs;
 
 namespace SqsReader.Integration.Test.Tests
 {
-    public abstract class BaseTest
+    public abstract class BaseTest : IDisposable
     {
         protected Mock<ISqsClient> SqsClientMock;
-        protected HealthCheckClient HealthCheckClient;
         protected Mock<ISqsConsumerService> SqsConsumerServiceMock;
+        protected HealthCheckClient HealthCheckClient;
 
         protected BaseTest()
         {
@@ -31,6 +32,12 @@ namespace SqsReader.Integration.Test.Tests
 
             var httpClient = server.CreateClient();
             HealthCheckClient = new HealthCheckClient(httpClient);
+        }
+
+        public void Dispose()
+        {
+            SqsClientMock.Verify(x => x.CreateQueue());
+            SqsConsumerServiceMock.Verify(x => x.StartConsuming());
         }
     }
 }

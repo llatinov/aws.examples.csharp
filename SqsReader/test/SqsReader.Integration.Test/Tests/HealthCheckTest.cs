@@ -1,15 +1,14 @@
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using SqsReader.Sqs;
+using Xunit;
 
 namespace SqsReader.Integration.Test.Tests
 {
-    [TestClass]
     public class HealthCheckTest : BaseTest
     {
-        [TestMethod]
+        [Fact]
         public async Task GetHealthReport_ReturnsHealthy()
         {
             SqsClientMock.Setup(x => x.GetQueueStatus())
@@ -17,11 +16,11 @@ namespace SqsReader.Integration.Test.Tests
 
             var response = await HealthCheckClient.GetHealth();
 
-            Assert.AreEqual(HttpStatusCode.OK, response.StatusCode);
-            Assert.AreEqual("Healthy", response.Result.Status);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal("Healthy", response.Result.Status);
         }
 
-        [TestMethod]
+        [Fact]
         public async Task GetHealthReport_ReturnsUnhealthy()
         {
             SqsClientMock.Setup(x => x.GetQueueStatus())
@@ -29,8 +28,8 @@ namespace SqsReader.Integration.Test.Tests
 
             var response = await HealthCheckClient.GetHealth();
 
-            Assert.AreEqual(HttpStatusCode.ServiceUnavailable, response.StatusCode);
-            Assert.AreEqual("Unhealthy", response.Result.Status);
+            Assert.Equal(HttpStatusCode.ServiceUnavailable, response.StatusCode);
+            Assert.Equal("Unhealthy", response.Result.Status);
         }
     }
 }

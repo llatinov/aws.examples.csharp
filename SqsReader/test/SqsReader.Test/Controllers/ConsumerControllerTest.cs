@@ -1,76 +1,67 @@
 using System.Threading.Tasks;
+using AutoFixture.Xunit2;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Moq;
+using NSubstitute;
 using SqsReader.Controllers;
 using SqsReader.Services;
 using SqsReader.Sqs;
+using Xunit;
 
 namespace SqsReader.Test.Controllers
 {
-    [TestClass]
     public class ConsumerControllerTest
     {
-        private ConsumerController _consumerControllerUnderTest;
-        private Mock<ISqsConsumerService> _consumerServiceMock;
-
-        [TestInitialize]
-        public void Setup()
+        [Theory, AutoNSubstituteData]
+        public void Start_ReturnsCorrectResult_AndCallsCorrectMethod(
+            [Frozen] ISqsConsumerService consumerServiceMock,
+            ConsumerController controllerUnderTest)
         {
-            _consumerServiceMock = new Mock<ISqsConsumerService>();
-            _consumerControllerUnderTest = new ConsumerController(_consumerServiceMock.Object);
-        }
-
-        [TestCleanup]
-        public void TearDown()
-        {
-            _consumerServiceMock.VerifyNoOtherCalls();
-        }
-
-        [TestMethod]
-        public void Start_ReturnsCorrectResult_AndCallsCorrectMethod()
-        {
-            var result = _consumerControllerUnderTest.Start();
+            var result = controllerUnderTest.Start();
             var asObjectResult = (StatusCodeResult)result;
 
-            Assert.AreEqual(200, asObjectResult.StatusCode);
-            _consumerServiceMock.Verify(x => x.StartConsuming());
+            Assert.Equal(200, asObjectResult.StatusCode);
+            consumerServiceMock.Received().StartConsuming();
         }
 
-        [TestMethod]
-        public void Stop_ReturnsCorrectResult_AndCallsCorrectMethod()
+        [Theory, AutoNSubstituteData]
+        public void Stop_ReturnsCorrectResult_AndCallsCorrectMethod(
+            [Frozen] ISqsConsumerService consumerServiceMock,
+            ConsumerController controllerUnderTest)
         {
-            var result = _consumerControllerUnderTest.Stop();
+            var result = controllerUnderTest.Stop();
             var asObjectResult = (StatusCodeResult)result;
 
-            Assert.AreEqual(200, asObjectResult.StatusCode);
-            _consumerServiceMock.Verify(x => x.StopConsuming());
+            Assert.Equal(200, asObjectResult.StatusCode);
+            consumerServiceMock.Received().StopConsuming();
         }
 
-        [TestMethod]
-        public void Reprocess_ReturnsCorrectResult_AndCallsCorrectMethod()
+        [Theory, AutoNSubstituteData]
+        public void Reprocess_ReturnsCorrectResult_AndCallsCorrectMethod(
+            [Frozen] ISqsConsumerService consumerServiceMock,
+            ConsumerController controllerUnderTest)
         {
-            var result = _consumerControllerUnderTest.Reprocess();
+            var result = controllerUnderTest.Reprocess();
             var asObjectResult = (StatusCodeResult)result;
 
-            Assert.AreEqual(200, asObjectResult.StatusCode);
-            _consumerServiceMock.Verify(x => x.ReprocessMessages());
+            Assert.Equal(200, asObjectResult.StatusCode);
+            consumerServiceMock.Received().ReprocessMessages();
         }
 
-        [TestMethod]
-        public async Task Status_ReturnsCorrectResult_AndCallsCorrectMethod()
+        [Theory, AutoNSubstituteData]
+        public async Task Status_ReturnsCorrectResult_AndCallsCorrectMethod(
+            [Frozen] ISqsConsumerService consumerServiceMock,
+            ConsumerController controllerUnderTest)
         {
             var sqsStatus = new SqsStatus();
-            _consumerServiceMock.Setup(x => x.GetStatus())
-                .ReturnsAsync(sqsStatus);
+            consumerServiceMock.GetStatus().Returns(sqsStatus);
 
-            var result = await _consumerControllerUnderTest.Status();
+            var result = await controllerUnderTest.Status();
             var asObjectResult = (ObjectResult)result;
             var asObjectValue = (SqsStatus)asObjectResult.Value;
 
-            Assert.AreEqual(200, asObjectResult.StatusCode);
-            Assert.AreEqual(sqsStatus, asObjectValue);
-            _consumerServiceMock.Verify(x => x.GetStatus());
+            Assert.Equal(200, asObjectResult.StatusCode);
+            Assert.Equal(sqsStatus, asObjectValue);
+            await consumerServiceMock.Received().GetStatus();
         }
     }
 }

@@ -6,7 +6,7 @@ using SqsReader.Services;
 namespace SqsReader.Controllers
 {
     [Route("api/[controller]")]
-    public class ConsumerController : Controller
+    public class ConsumerController : ControllerBase
     {
         private readonly ISqsConsumerService _sqsConsumerService;
 
