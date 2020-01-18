@@ -213,7 +213,7 @@ namespace SqsReader.Sqs
             await DeleteMessageAsync(_appConfig.AwsQueueName, receiptHandle);
         }
 
-        public async Task RestoreFromDeadLetterQueue(CancellationToken cancellationToken = default)
+        public async Task RestoreFromDeadLetterQueueAsync(CancellationToken cancellationToken = default)
         {
             var deadLetterQueueName = _appConfig.AwsDeadLetterQueueName;
 

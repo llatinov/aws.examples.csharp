@@ -37,7 +37,7 @@ namespace SqsReader.Integration.Test.Tests
         public void Dispose()
         {
             SqsClientMock.Verify(x => x.CreateQueue());
-            SqsConsumerServiceMock.Verify(x => x.StartConsumingAsync());
+            SqsConsumerServiceMock.Verify(x => x.StartConsuming());
         }
     }
 }

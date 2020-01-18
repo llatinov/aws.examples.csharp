@@ -33,27 +33,26 @@ namespace SqsReader.Services
             return status;
         }
 
-        public async Task StartConsumingAsync()
+        public void StartConsuming()
         {
-            if (IsConsuming())
-                return;
-
-            _tokenSource = new CancellationTokenSource();
-            await ProcessAsync();
+            if (!IsConsuming())
+            {
+                _tokenSource = new CancellationTokenSource();
+                ProcessAsync();
+            }
         }
 
-        public Task StopConsumingAsync()
+        public void StopConsuming()
         {
             if (IsConsuming())
             {
                 _tokenSource.Cancel();
             }
-            return Task.CompletedTask;
         }
 
         public async Task ReprocessMessagesAsync()
         {
-            await _sqsClient.RestoreFromDeadLetterQueue();
+            await _sqsClient.RestoreFromDeadLetterQueueAsync();
         }
 
         private bool IsConsuming()
@@ -61,7 +60,7 @@ namespace SqsReader.Services
             return _tokenSource != null && !_tokenSource.Token.IsCancellationRequested;
         }
 
-        private async Task ProcessAsync()
+        private async void ProcessAsync()
         {
             try
             {

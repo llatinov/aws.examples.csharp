@@ -19,6 +19,6 @@ namespace SqsReader.Sqs
 
         Task DeleteMessageAsync(string receiptHandle);
 
-        Task RestoreFromDeadLetterQueue(CancellationToken cancellationToken = default);
+        Task RestoreFromDeadLetterQueueAsync(CancellationToken cancellationToken = default);
     }
 }

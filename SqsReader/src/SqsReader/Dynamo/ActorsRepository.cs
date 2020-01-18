@@ -25,25 +25,15 @@ namespace SqsReader.Dynamo
                 {
                     new KeySchemaElement
                     {
-                        AttributeName = "LastName",
+                        AttributeName = "Id",
                         KeyType = "HASH"
-                    },
-                    new KeySchemaElement
-                    {
-                        AttributeName = "FirstName",
-                        KeyType = "RANGE"
                     }
                 },
                 AttributeDefinitions = new List<AttributeDefinition>
                 {
                     new AttributeDefinition
                     {
-                        AttributeName = "FirstName",
-                        AttributeType = "S"
-                    },
-                    new AttributeDefinition
-                    {
-                        AttributeName = "LastName",
+                        AttributeName = "Id",
                         AttributeType = "S"
                     }
                 },
@@ -62,10 +52,11 @@ namespace SqsReader.Dynamo
             var request = new PutItemRequest
             {
                 TableName = TableName,
-                Item = new Dictionary<string, AttributeValue>()
+                Item = new Dictionary<string, AttributeValue>
                 {
-                    { "FirstName", new AttributeValue { S = actor.FirstName }},
-                    { "LastName", new AttributeValue { S = actor.LastName }},
+                    {"Id", new AttributeValue {S = actor.FirstName + actor.LastName}},
+                    {"FirstName", new AttributeValue {S = actor.FirstName}},
+                    {"LastName", new AttributeValue {S = actor.LastName}}
                 }
             };
             await _client.PutItemAsync(request);

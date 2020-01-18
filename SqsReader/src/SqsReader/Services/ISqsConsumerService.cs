@@ -7,9 +7,9 @@ namespace SqsReader.Services
     {
         Task<SqsStatus> GetStatusAsync();
 
-        Task StartConsumingAsync();
+        void StartConsuming();
 
-        Task StopConsumingAsync();
+        void StopConsuming();
 
         Task ReprocessMessagesAsync();
     }

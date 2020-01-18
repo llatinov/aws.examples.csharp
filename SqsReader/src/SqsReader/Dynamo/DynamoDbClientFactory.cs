@@ -7,7 +7,7 @@ namespace SqsReader.Dynamo
     {
         public static AmazonDynamoDBClient CreateClient(AppConfig appConfig)
         {
-            var dynamoDbConfig = new AmazonDynamoDBConfig()
+            var dynamoDbConfig = new AmazonDynamoDBConfig
             {
                 RegionEndpoint = RegionEndpoint.GetBySystemName(appConfig.AwsRegion)
             };

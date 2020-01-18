@@ -12,27 +12,27 @@ namespace SqsReader.Test.Controllers
     public class ConsumerControllerTest
     {
         [Theory, AutoNSubstituteData]
-        public async Task Start_ReturnsCorrectResult_AndCallsCorrectMethod(
+        public void Start_ReturnsCorrectResult_AndCallsCorrectMethod(
             [Frozen] ISqsConsumerService consumerServiceMock,
             ConsumerController controllerUnderTest)
         {
-            var result = await controllerUnderTest.Start();
+            var result = controllerUnderTest.Start();
             var asObjectResult = (StatusCodeResult)result;
 
             Assert.Equal(200, asObjectResult.StatusCode);
-            await consumerServiceMock.Received().StartConsumingAsync();
+            consumerServiceMock.Received().StartConsuming();
         }
 
         [Theory, AutoNSubstituteData]
-        public async Task Stop_ReturnsCorrectResult_AndCallsCorrectMethod(
+        public void Stop_ReturnsCorrectResult_AndCallsCorrectMethod(
             [Frozen] ISqsConsumerService consumerServiceMock,
             ConsumerController controllerUnderTest)
         {
-            var result = await controllerUnderTest.Stop();
+            var result = controllerUnderTest.Stop();
             var asObjectResult = (StatusCodeResult)result;
 
             Assert.Equal(200, asObjectResult.StatusCode);
-            await consumerServiceMock.Received().StopConsumingAsync();
+            consumerServiceMock.Received().StopConsuming();
         }
 
         [Theory, AutoNSubstituteData]

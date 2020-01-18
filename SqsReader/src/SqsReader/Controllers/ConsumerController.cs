@@ -17,17 +17,17 @@ namespace SqsReader.Controllers
 
         [HttpPost]
         [Route("start")]
-        public async Task<IActionResult> Start()
+        public IActionResult Start()
         {
-            await _sqsConsumerService.StartConsumingAsync();
+            _sqsConsumerService.StartConsuming();
             return StatusCode((int)HttpStatusCode.OK);
         }
 
         [HttpPost]
         [Route("stop")]
-        public async Task<IActionResult> Stop()
+        public IActionResult Stop()
         {
-            await _sqsConsumerService.StopConsumingAsync();
+            _sqsConsumerService.StopConsuming();
             return StatusCode((int)HttpStatusCode.OK);
         }
 

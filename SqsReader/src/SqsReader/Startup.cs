@@ -70,7 +70,7 @@ namespace SqsReader
                 await sqsClient.CreateQueue();
             }
 
-            await sqsConsumerService.StartConsumingAsync();
+            sqsConsumerService.StartConsuming();
             await actorsRepository.CreateTableAsync();
         }
     }
