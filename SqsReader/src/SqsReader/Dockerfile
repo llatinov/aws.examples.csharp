@@ -3,8 +3,9 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/core/sdk:3.0-buster AS build
 WORKDIR /src
-COPY . .
+COPY SqsReader.csproj /src/SqsReader.csproj
 RUN dotnet restore
+COPY . .
 RUN dotnet publish -c Release -o /pub
 
 FROM base AS final
