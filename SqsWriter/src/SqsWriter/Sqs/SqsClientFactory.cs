@@ -5,13 +5,13 @@ namespace SqsWriter.Sqs
 {
     public class SqsClientFactory
     {
-        public static AmazonSQSClient CreateClient(AppConfig awsConfig)
+        public static AmazonSQSClient CreateClient(AppConfig appConfig)
         {
             var sqsConfig = new AmazonSQSConfig
             {
-                RegionEndpoint = RegionEndpoint.GetBySystemName(awsConfig.AwsRegion)
+                RegionEndpoint = RegionEndpoint.GetBySystemName(appConfig.AwsRegion)
             };
-            var awsCredentials = new AwsCredentials(awsConfig);
+            var awsCredentials = new AwsCredentials(appConfig);
             return new AmazonSQSClient(awsCredentials, sqsConfig);
         }
     }

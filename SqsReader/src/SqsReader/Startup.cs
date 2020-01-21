@@ -1,4 +1,5 @@
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DataModel;
 using Amazon.SQS;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
@@ -41,7 +42,9 @@ namespace SqsReader
 
             services.AddSingleton<IAmazonDynamoDB>(x => DynamoDbClientFactory.CreateClient(_appConfig));
             services.AddSingleton<IDatabaseClient, DatabaseClient>();
+            services.AddSingleton<IDynamoDBContext, DynamoDBContext>();
             services.AddSingleton<IActorsRepository, ActorsRepository>();
+            services.AddSingleton<IMoviesRepository, MoviesRepository>();
 
             services.AddScoped<IMessageProcessor, ActorMessageProcessor>();
             services.AddScoped<IMessageProcessor, MovieMessageProcessor>();
@@ -54,7 +57,8 @@ namespace SqsReader
             IApplicationBuilder app,
             ISqsClient sqsClient,
             ISqsConsumerService sqsConsumerService,
-            IActorsRepository actorsRepository)
+            IActorsRepository actorsRepository,
+            IMoviesRepository moviesRepository)
         {
             app.UseSerilogRequestLogging();
             app.UseRouting();
@@ -71,6 +75,7 @@ namespace SqsReader
 
             sqsConsumerService.StartConsuming();
             await actorsRepository.CreateTableAsync();
+            await moviesRepository.CreateTableAsync();
         }
     }
 }

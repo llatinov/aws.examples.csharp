@@ -2,15 +2,19 @@
 using Amazon.SQS.Model;
 using Microsoft.Extensions.Logging;
 using Models;
+using Newtonsoft.Json;
+using SqsReader.Dynamo;
 
 namespace SqsReader.Services.Processors
 {
     public class MovieMessageProcessor : IMessageProcessor
     {
+        private readonly IMoviesRepository _moviesRepository;
         private readonly ILogger<MovieMessageProcessor> _logger;
 
-        public MovieMessageProcessor(ILogger<MovieMessageProcessor> logger)
+        public MovieMessageProcessor(IMoviesRepository moviesRepository, ILogger<MovieMessageProcessor> logger)
         {
+            _moviesRepository = moviesRepository;
             _logger = logger;
         }
 
@@ -19,10 +23,11 @@ namespace SqsReader.Services.Processors
             return messageType == typeof(Movie).Name;
         }
 
-        public Task ProcessAsync(Message message)
+        public async Task ProcessAsync(Message message)
         {
             _logger.LogInformation($"MovieMessageProcessor invoked with: {message.Body}");
-            return Task.CompletedTask;
+            var movie = JsonConvert.DeserializeObject<Movie>(message.Body);
+            await _moviesRepository.SaveMovieAsync(movie);
         }
     }
 }
