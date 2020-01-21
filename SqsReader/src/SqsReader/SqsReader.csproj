@@ -10,6 +10,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Automationrhapsody.Aws.Examples.Models" Version="1.0.0" />
     <PackageReference Include="AWSSDK.DynamoDBv2" Version="3.3.104.19" />
     <PackageReference Include="AWSSDK.SQS" Version="3.3.102.56" />
     <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />

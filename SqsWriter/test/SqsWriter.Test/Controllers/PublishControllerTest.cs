@@ -2,10 +2,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Models;
 using Moq;
 using SqsWriter.Controllers;
 using SqsWriter.Sqs;
-using SqsWriter.Sqs.Models;
 
 namespace SqsWriter.Test.Controllers
 {

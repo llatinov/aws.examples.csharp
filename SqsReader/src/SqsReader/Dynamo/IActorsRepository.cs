@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using SqsReader.Sqs.Models;
+using Models;
 
 namespace SqsReader.Dynamo
 {

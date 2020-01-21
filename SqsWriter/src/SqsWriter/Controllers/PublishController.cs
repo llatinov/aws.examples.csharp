@@ -2,9 +2,9 @@ using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Models;
 using Newtonsoft.Json;
 using SqsWriter.Sqs;
-using SqsWriter.Sqs.Models;
 
 namespace SqsWriter.Controllers
 {

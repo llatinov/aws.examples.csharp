@@ -1,9 +1,9 @@
 ﻿using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using Microsoft.Extensions.Logging;
+using Models;
 using Newtonsoft.Json;
 using SqsReader.Dynamo;
-using SqsReader.Sqs.Models;
 
 namespace SqsReader.Services.Processors
 {

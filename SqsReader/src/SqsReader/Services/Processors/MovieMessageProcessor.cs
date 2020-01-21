@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using Microsoft.Extensions.Logging;
-using SqsReader.Sqs.Models;
+using Models;
 
 namespace SqsReader.Services.Processors
 {

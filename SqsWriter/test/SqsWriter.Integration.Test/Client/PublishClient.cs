@@ -1,6 +1,6 @@
 using System.Net.Http;
 using System.Threading.Tasks;
-using SqsWriter.Sqs.Models;
+using Models;
 
 namespace SqsWriter.Integration.Test.Client
 {

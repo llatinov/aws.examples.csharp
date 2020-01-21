@@ -4,9 +4,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Models;
 using Moq;
 using Newtonsoft.Json;
-using SqsWriter.Sqs.Models;
 
 namespace SqsWriter.Integration.Test.Tests
 {

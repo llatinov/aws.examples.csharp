@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using Amazon.DynamoDBv2;
 using Amazon.SQS;
 using Microsoft.AspNetCore.Builder;

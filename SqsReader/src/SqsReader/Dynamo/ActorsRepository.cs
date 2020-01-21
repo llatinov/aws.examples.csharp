@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
-using SqsReader.Sqs.Models;
+using Models;
 
 namespace SqsReader.Dynamo
 {
