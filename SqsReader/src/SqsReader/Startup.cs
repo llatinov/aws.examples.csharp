@@ -70,7 +70,7 @@ namespace SqsReader
 
             if (_appConfig.AwsQueueAutomaticallyCreate)
             {
-                await sqsClient.CreateQueue();
+                await sqsClient.CreateQueueAsync();
             }
 
             sqsConsumerService.StartConsuming();

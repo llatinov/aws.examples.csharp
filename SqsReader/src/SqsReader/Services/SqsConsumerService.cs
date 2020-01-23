@@ -27,7 +27,7 @@ namespace SqsReader.Services
 
         public async Task<SqsStatus> GetStatusAsync()
         {
-            var status = await _sqsClient.GetQueueStatus();
+            var status = await _sqsClient.GetQueueStatusAsync();
             status.IsConsuming = IsConsuming();
 
             return status;

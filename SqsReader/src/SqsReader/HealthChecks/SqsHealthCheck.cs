@@ -16,7 +16,7 @@ namespace SqsReader.HealthChecks
 
         public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context, CancellationToken cancellationToken = new CancellationToken())
         {
-            var queueStatus = await _sqsClient.GetQueueStatus();
+            var queueStatus = await _sqsClient.GetQueueStatusAsync();
             var healthStatus = queueStatus.IsHealthy ? HealthStatus.Healthy : HealthStatus.Unhealthy;
             var description = $"Status for '{_sqsClient.GetQueueName()}' queue";
 

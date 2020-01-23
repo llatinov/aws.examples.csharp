@@ -11,7 +11,7 @@ namespace SqsReader.Integration.Test.Tests
         [Fact]
         public async Task GetHealthReport_ReturnsHealthy()
         {
-            SqsClientMock.Setup(x => x.GetQueueStatus())
+            SqsClientMock.Setup(x => x.GetQueueStatusAsync())
                 .ReturnsAsync(new SqsStatus { IsHealthy = true });
 
             var response = await HealthCheckClient.GetHealth();
@@ -23,7 +23,7 @@ namespace SqsReader.Integration.Test.Tests
         [Fact]
         public async Task GetHealthReport_ReturnsUnhealthy()
         {
-            SqsClientMock.Setup(x => x.GetQueueStatus())
+            SqsClientMock.Setup(x => x.GetQueueStatusAsync())
                 .ReturnsAsync(new SqsStatus { IsHealthy = false });
 
             var response = await HealthCheckClient.GetHealth();

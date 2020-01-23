@@ -37,7 +37,7 @@ namespace SqsWriter
                 .AddCheck<SqsHealthCheck>("SQS Health Check");
         }
 
-        public void Configure(IApplicationBuilder app, ISqsClient sqsClient)
+        public async void Configure(IApplicationBuilder app, ISqsClient sqsClient)
         {
             app.UseSerilogRequestLogging();
             app.UseMiddleware<HttpExceptionMiddleware>();
@@ -50,7 +50,7 @@ namespace SqsWriter
 
             if (_appConfig.AwsQueueAutomaticallyCreate)
             {
-                sqsClient.CreateQueue().Wait();
+                await sqsClient.CreateQueueAsync();
             }
         }
     }

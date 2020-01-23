@@ -32,7 +32,7 @@ namespace SqsWriter.Sqs
             return _appConfig.AwsQueueName;
         }
 
-        public async Task CreateQueue()
+        public async Task CreateQueueAsync()
         {
             const string arnAttribute = "QueueArn";
 
@@ -80,7 +80,7 @@ namespace SqsWriter.Sqs
             }
         }
 
-        public async Task<SqsStatus> GetQueueStatus()
+        public async Task<SqsStatus> GetQueueStatusAsync()
         {
             var queueName = _appConfig.AwsQueueName;
             var queueUrl = await GetQueueUrl(queueName);

@@ -9,9 +9,9 @@ namespace SqsWriter.Sqs
     {
         string GetQueueName();
 
-        Task CreateQueue();
+        Task CreateQueueAsync();
 
-        Task<SqsStatus> GetQueueStatus();
+        Task<SqsStatus> GetQueueStatusAsync();
 
         Task<List<Message>> GetMessagesAsync(CancellationToken cancellationToken = default);
 
