@@ -1,0 +1,31 @@
+version: "3"
+
+services:
+  sqs-reader:
+    build: SqsReader/src/SqsReader
+    ports:
+      - 5200:5200
+    environment:
+      - AwsSqsServiceUrl=http://host.docker.internal:4576
+      - AwsDynamoServiceUrl=http://host.docker.internal:4569
+      - AwsRegion
+      - AwsAccessKey
+      - AwsSecretKey
+      - AwsQueueName
+      - AwsQueueIsFifo
+      - AwsQueueLongPollTimeSeconds
+      - AwsQueueAutomaticallyCreate
+
+  sqs-writer:
+    build: SqsWriter/src/SqsWriter
+    ports:
+      - 5100:5100
+    environment:
+      - AwsSqsServiceUrl=http://host.docker.internal:4576
+      - AwsRegion
+      - AwsAccessKey
+      - AwsSecretKey
+      - AwsQueueName
+      - AwsQueueIsFifo
+      - AwsQueueLongPollTimeSeconds
+      - AwsQueueAutomaticallyCreate

@@ -6,6 +6,8 @@ namespace SqsReader
         private string _queueName;
 
         public string AwsRegion { get; set; }
+        public string AwsSqsServiceUrl { get; set; }
+        public string AwsDynamoServiceUrl { get; set; }
         public string AwsAccessKey { get; set; }
         public string AwsSecretKey { get; set; }
         public string AwsQueueName

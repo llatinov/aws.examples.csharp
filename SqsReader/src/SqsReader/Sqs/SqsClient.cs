@@ -120,7 +120,7 @@ namespace SqsReader.Sqs
                     QueueUrl = queueUrl,
                     WaitTimeSeconds = _appConfig.AwsQueueLongPollTimeSeconds,
                     AttributeNames = new List<string> { "ApproximateReceiveCount" },
-                    MessageAttributeNames = new List<string> { "*" }
+                    MessageAttributeNames = new List<string> { MessageAttributes.MessageType }
                 }, cancellationToken);
 
                 if (response.HttpStatusCode != HttpStatusCode.OK)

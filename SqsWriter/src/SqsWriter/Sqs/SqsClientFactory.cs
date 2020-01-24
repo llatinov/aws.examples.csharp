@@ -7,10 +7,15 @@ namespace SqsWriter.Sqs
     {
         public static AmazonSQSClient CreateClient(AppConfig appConfig)
         {
-            var sqsConfig = new AmazonSQSConfig
+            var sqsConfig = new AmazonSQSConfig();
+            if (!string.IsNullOrEmpty(appConfig.AwsSqsServiceUrl))
             {
-                RegionEndpoint = RegionEndpoint.GetBySystemName(appConfig.AwsRegion)
-            };
+                sqsConfig.ServiceURL = appConfig.AwsSqsServiceUrl;
+            }
+            else
+            {
+                sqsConfig.RegionEndpoint = RegionEndpoint.GetBySystemName(appConfig.AwsRegion);
+            }
             var awsCredentials = new AwsCredentials(appConfig);
             return new AmazonSQSClient(awsCredentials, sqsConfig);
         }

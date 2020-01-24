@@ -7,10 +7,15 @@ namespace SqsReader.Dynamo
     {
         public static AmazonDynamoDBClient CreateClient(AppConfig appConfig)
         {
-            var dynamoDbConfig = new AmazonDynamoDBConfig
+            var dynamoDbConfig = new AmazonDynamoDBConfig();
+            if (!string.IsNullOrEmpty(appConfig.AwsDynamoServiceUrl))
             {
-                RegionEndpoint = RegionEndpoint.GetBySystemName(appConfig.AwsRegion)
-            };
+                dynamoDbConfig.ServiceURL = appConfig.AwsDynamoServiceUrl;
+            }
+            else
+            {
+                dynamoDbConfig.RegionEndpoint = RegionEndpoint.GetBySystemName(appConfig.AwsRegion);
+            }
             var awsCredentials = new AwsCredentials(appConfig);
             return new AmazonDynamoDBClient(awsCredentials, dynamoDbConfig);
         }
