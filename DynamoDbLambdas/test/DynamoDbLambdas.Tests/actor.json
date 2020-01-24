@@ -1,0 +1,50 @@
+{
+    "ApproximateCreationDateTime": "2020-01-24T11:33:27Z",
+    "Keys": {
+        "Id": {
+            "BOOL": false,
+            "IsBOOLSet": false,
+            "IsLSet": false,
+            "M": {},
+            "IsMSet": false,
+            "NULL": false,
+            "S": "TestFirstNameTestLastName"
+        }
+    },
+    "NewImage": {
+        "FirstName": {
+            "BOOL": false,
+            "IsBOOLSet": false,
+            "IsLSet": false,
+            "M": {},
+            "IsMSet": false,
+            "N": null,
+            "NULL": false,
+            "S": "TestFirstName"
+        },
+        "Id": {
+            "BOOL": false,
+            "IsBOOLSet": false,
+            "IsLSet": false,
+            "M": {},
+            "IsMSet": false,
+            "NULL": false,
+            "S": "TestFirstNameTestLastName"
+        },
+        "LastName": {
+            "BOOL": false,
+            "IsBOOLSet": false,
+            "IsLSet": false,
+            "M": {},
+            "IsMSet": false,
+            "NULL": false,
+            "S": "TestLastName"
+        }
+    },
+    "OldImage": {},
+    "SequenceNumber": "25567400000000000393411126",
+    "SizeBytes": 54,
+    "StreamViewType": {
+        "Value": "NEW_AND_OLD_IMAGES"
+    }
+}

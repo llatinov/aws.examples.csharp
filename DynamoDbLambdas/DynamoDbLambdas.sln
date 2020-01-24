@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29709.97
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamoDbLambdas", "src\DynamoDbLambdas\DynamoDbLambdas.csproj", "{04D37297-C891-48EE-9570-D4C901B6FD86}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DynamoDbLambdas.Tests", "test\DynamoDbLambdas.Tests\DynamoDbLambdas.Tests.csproj", "{3DC2821D-4E4C-4BDB-A020-7202805B797A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{04D37297-C891-48EE-9570-D4C901B6FD86}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04D37297-C891-48EE-9570-D4C901B6FD86}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04D37297-C891-48EE-9570-D4C901B6FD86}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04D37297-C891-48EE-9570-D4C901B6FD86}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DC2821D-4E4C-4BDB-A020-7202805B797A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DC2821D-4E4C-4BDB-A020-7202805B797A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DC2821D-4E4C-4BDB-A020-7202805B797A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DC2821D-4E4C-4BDB-A020-7202805B797A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {08BCA5EC-FAD7-467B-B07D-B3E1AAEB2078}
+	EndGlobalSection
+EndGlobal
