@@ -7,7 +7,7 @@
     <Authors>Lyudmil Latinov</Authors>
     <Company>Automationrhapsody.com</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.1</Version>
+    <Version>1.0.2</Version>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 

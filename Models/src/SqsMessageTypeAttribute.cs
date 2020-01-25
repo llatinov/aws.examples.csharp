@@ -9,7 +9,7 @@ namespace Models
     {
         private const string AttributeName = "MessageType";
 
-        public static string GetAttributeValue(this Dictionary<string, MessageAttributeValue> attributes)
+        public static string GetMessageTypeAttributeValue(this Dictionary<string, MessageAttributeValue> attributes)
         {
             return attributes.SingleOrDefault(x => x.Key == AttributeName).Value?.StringValue;
         }
