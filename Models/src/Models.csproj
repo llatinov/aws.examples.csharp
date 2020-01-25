@@ -3,11 +3,11 @@
   <PropertyGroup>
     <PackageId>Automationrhapsody.Aws.Examples.Models</PackageId>
     <OutputType>Library</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
     <Authors>Lyudmil Latinov</Authors>
     <Company>Automationrhapsody.com</Company>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <PackageLicenseFile>license.txt</PackageLicenseFile>
   </PropertyGroup>
 
