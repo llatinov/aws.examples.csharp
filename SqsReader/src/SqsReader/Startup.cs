@@ -48,6 +48,7 @@ namespace SqsReader
 
             services.AddScoped<IMessageProcessor, ActorMessageProcessor>();
             services.AddScoped<IMessageProcessor, MovieMessageProcessor>();
+            services.AddScoped<IMessageProcessor, LogEntryMessageProcessor>();
 
             services.AddHealthChecks()
                 .AddCheck<SqsHealthCheck>("SQS Health Check");

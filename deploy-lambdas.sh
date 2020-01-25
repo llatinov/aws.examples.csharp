@@ -4,16 +4,46 @@ export AWS_DEFAULT_REGION=$AwsRegion
 
 roleName=lambda-admin-role
 policyName=AdministratorAccess
+timeout=30
 lambdasZipFile=DynamoDbLambdas/src/DynamoDbLambdas/bin/Release/netcoreapp2.1/DynamoDbLambdas.zip
 actorsLambda=ActorsLambdaFunction
 actorsTable=Actors
-actorsHandler=DynamoDbLambdas::DynamoDbLambdas.ActorFunction::FunctionHandler
+actorsHandler=DynamoDbLambdas::DynamoDbLambdas.ActorsFunction::FunctionHandler
+moviesLambda=MoviesLambdaFunction
+moviesTable=Movies
+moviesHandler=DynamoDbLambdas::DynamoDbLambdas.MoviesFunction::FunctionHandler
+entriesTable=LogEntries
 
-actorsArn=$(aws dynamodb describe-table --table-name $actorsTable | jq -r ".Table | select(.TableName==\"$actorsTable\") | .LatestStreamArn")
-if [ "$actorsArn" = "" ]
+actorsStreamArn=$(aws dynamodb describe-table --table-name $actorsTable | jq -r ".Table | select(.TableName==\"$actorsTable\") | .LatestStreamArn")
+if [ "$actorsStreamArn" = "" ]
 then
-	echo "Table $actorsTable does not exist"
-	exit 1
+	actorsStreamArn=$(aws dynamodb create-table \
+		--table-name $actorsTable \
+		--attribute-definitions 'AttributeName=Id,AttributeType=S' \
+		--key-schema 'AttributeName=Id,KeyType=HASH' \
+		--provisioned-throughput 'ReadCapacityUnits=5,WriteCapacityUnits=5' \
+		--stream-specification 'StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES' | jq -r ".TableDescription.LatestStreamArn")
+fi
+
+moviesStreamArn=$(aws dynamodb describe-table --table-name $moviesTable | jq -r ".Table | select(.TableName==\"$moviesTable\") | .LatestStreamArn")
+if [ "$moviesStreamArn" = "" ]
+then
+	moviesStreamArn=$(aws dynamodb create-table \
+		--table-name $moviesTable \
+		--attribute-definitions AttributeName=Title,AttributeType=S \
+		--key-schema AttributeName=Title,KeyType=HASH \
+		--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
+		--stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES | jq -r ".TableDescription.LatestStreamArn")
+fi
+
+entriesArn=$(aws dynamodb describe-table --table-name $entriesTable | jq -r ".Table | select(.TableName==\"$entriesTable\") | .Arn")
+if [ "$entriesArn" = "" ]
+then
+	aws dynamodb create-table \
+		--table-name $entriesTable \
+		--attribute-definitions AttributeName=Message,AttributeType=S AttributeName=DateTime,AttributeType=S \
+		--key-schema AttributeName=Message,KeyType=HASH AttributeName=DateTime,KeyType=RANGE \
+		--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
 fi
 
 roleArn=$(aws iam list-roles | jq -r ".Roles[] | select(.RoleName==\"$roleName\") | .Arn")
@@ -41,6 +71,8 @@ function create_or_update_lambda() {
 			--runtime dotnetcore2.1 \
 			--role $roleArn \
 			--handler $2 \
+			--environment "Variables={AWS_SQS_QUEUE_NAME=$AwsQueueName, AWS_SQS_IS_FIFO=$AwsQueueIsFifo}" \
+			--timeout $timeout \
 			--zip-file fileb://$lambdasZipFile
 		aws lambda create-event-source-mapping \
 			--function-name $1 \
@@ -54,10 +86,13 @@ function create_or_update_lambda() {
 		aws lambda update-function-configuration \
 			--function-name $1 \
 			--role $roleArn \
-			--handler $2
+			--handler $2 \
+			--environment "Variables={AWS_SQS_QUEUE_NAME=$AwsQueueName, AWS_SQS_IS_FIFO=$AwsQueueIsFifo}" \
+			--timeout $timeout
 	fi
 }
 
 dotnet lambda package --project-location DynamoDbLambdas/src/DynamoDbLambdas
 
-create_or_update_lambda $actorsLambda $actorsHandler $actorsArn
+create_or_update_lambda $actorsLambda $actorsHandler $actorsStreamArn
+create_or_update_lambda $moviesLambda $moviesHandler $moviesStreamArn

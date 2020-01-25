@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.DataModel;
 using Amazon.DynamoDBv2.Model;
 using Models;
@@ -48,7 +49,12 @@ namespace SqsReader.Dynamo
                 ProvisionedThroughput = new ProvisionedThroughput
                 {
                     ReadCapacityUnits = 5,
-                    WriteCapacityUnits = 6
+                    WriteCapacityUnits = 5
+                },
+                StreamSpecification = new StreamSpecification
+                {
+                    StreamEnabled = true,
+                    StreamViewType = StreamViewType.NEW_AND_OLD_IMAGES
                 }
             };
 
