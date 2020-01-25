@@ -1,5 +1,6 @@
 export AWS_ACCESS_KEY_ID=$AwsAccessKey
 export AWS_SECRET_ACCESS_KEY=$AwsSecretKey
+export AWS_DEFAULT_REGION=$AwsRegion
 
 roleName=lambda-admin-role
 policyName=AdministratorAccess

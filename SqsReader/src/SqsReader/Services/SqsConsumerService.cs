@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Amazon.SQS.Model;
 using Microsoft.Extensions.Logging;
+using Models;
 using Newtonsoft.Json;
 using SqsReader.Services.Processors;
 using SqsReader.Sqs;
@@ -81,16 +82,16 @@ namespace SqsReader.Services
         {
             try
             {
-                var messageType = message.MessageAttributes.SingleOrDefault(x => x.Key == MessageAttributes.MessageType).Value;
+                var messageType = message.MessageAttributes.GetMessageTypeAttributeValue();
                 if (messageType == null)
                 {
-                    throw new Exception($"No '{MessageAttributes.MessageType}' attribute present in message {JsonConvert.SerializeObject(message)}");
+                    throw new Exception($"No 'MessageType' attribute present in message {JsonConvert.SerializeObject(message)}");
                 }
 
-                var processor = _messageProcessors.SingleOrDefault(x => x.CanProcess(messageType.StringValue));
+                var processor = _messageProcessors.SingleOrDefault(x => x.CanProcess(messageType));
                 if (processor == null)
                 {
-                    throw new Exception($"No processor found for message type '{messageType.StringValue}'");
+                    throw new Exception($"No processor found for message type '{messageType}'");
                 }
 
                 await processor.ProcessAsync(message);

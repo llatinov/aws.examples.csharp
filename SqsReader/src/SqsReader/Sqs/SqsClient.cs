@@ -9,6 +9,7 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Models;
 using Newtonsoft.Json;
 
 namespace SqsReader.Sqs
@@ -120,7 +121,7 @@ namespace SqsReader.Sqs
                     QueueUrl = queueUrl,
                     WaitTimeSeconds = _appConfig.AwsQueueLongPollTimeSeconds,
                     AttributeNames = new List<string> { "ApproximateReceiveCount" },
-                    MessageAttributeNames = new List<string> { MessageAttributes.MessageType }
+                    MessageAttributeNames = new List<string> { "All" }
                 }, cancellationToken);
 
                 if (response.HttpStatusCode != HttpStatusCode.OK)
@@ -157,16 +158,7 @@ namespace SqsReader.Sqs
                 {
                     QueueUrl = queueUrl,
                     MessageBody = messageBody,
-                    MessageAttributes = new Dictionary<string, MessageAttributeValue>
-                    {
-                        {
-                            MessageAttributes.MessageType, new MessageAttributeValue
-                            {
-                                DataType = nameof(String),
-                                StringValue = messageType
-                            }
-                        }
-                    }
+                    MessageAttributes = SqsMessageTypeAttribute.CreateAttributes(messageType)
                 };
                 if (_appConfig.AwsQueueIsFifo)
                 {
@@ -231,7 +223,7 @@ namespace SqsReader.Sqs
 
                     messages.ForEach(async message =>
                     {
-                        var messageType = message.MessageAttributes.GetMessageType();
+                        var messageType = message.MessageAttributes.GetMessageTypeAttributeValue();
                         if (messageType != null)
                         {
                             await PostMessageAsync(message.Body, messageType);

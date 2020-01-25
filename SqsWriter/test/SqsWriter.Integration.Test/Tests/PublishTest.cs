@@ -23,7 +23,7 @@ namespace SqsWriter.Integration.Test.Tests
         [TestCleanup]
         public void TestCleanup()
         {
-            SqsClientMock.Verify(x => x.CreateQueue(), Times.Once);
+            SqsClientMock.Verify(x => x.CreateQueueAsync(), Times.Once);
             SqsClientMock.VerifyNoOtherCalls();
         }
 

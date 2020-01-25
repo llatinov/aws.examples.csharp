@@ -8,6 +8,7 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Models;
 using Newtonsoft.Json;
 
 namespace SqsWriter.Sqs
@@ -156,16 +157,7 @@ namespace SqsWriter.Sqs
                 {
                     QueueUrl = queueUrl,
                     MessageBody = JsonConvert.SerializeObject(message),
-                    MessageAttributes = new Dictionary<string, MessageAttributeValue>
-                    {
-                        {
-                            MessageAttributes.MessageType, new MessageAttributeValue
-                            {
-                                DataType = nameof(String),
-                                StringValue = typeof(T).Name
-                            }
-                        }
-                    }
+                    MessageAttributes = SqsMessageTypeAttribute.CreateAttributes<T>()
                 };
                 if (_appConfig.AwsQueueIsFifo)
                 {
