@@ -7,7 +7,7 @@ securityGroup=$clusterName
 sqsReaderProjectName=SqsReader
 sqsReaderRepository=aws.examples.csharp.sqs.reader
 sqsWriterProjectName=SqsWriter
-sqsReaderRepository=aws.examples.csharp.sqs.writer
+sqsWriterRepository=aws.examples.csharp.sqs.writer
 
 function delete_services() {
 	for taskDefinition in $(aws ecs list-task-definitions | jq -r ".taskDefinitionArns[] | select(. | contains(\"$1\"))")
