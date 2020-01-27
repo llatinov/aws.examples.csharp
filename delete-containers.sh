@@ -29,7 +29,7 @@ function delete_services() {
 		taskStatus=$(aws ecs describe-tasks --cluster $clusterName --tasks $taskArn | jq -r ".tasks[0].lastStatus")
 	done
 
-	#aws ecr delete-repository --repository-name $2 --force
+	aws ecr delete-repository --repository-name $2 --force
 }
 
 delete_services $sqsReaderProjectName $sqsReaderRepository
