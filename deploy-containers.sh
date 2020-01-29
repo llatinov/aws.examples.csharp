@@ -7,7 +7,7 @@ securityGroup=$clusterName
 sqsReaderProjectName=SqsReader
 sqsReaderRepository=aws.examples.csharp.sqs.reader
 sqsWriterProjectName=SqsWriter
-sqsReaderRepository=aws.examples.csharp.sqs.writer
+sqsWriterRepository=aws.examples.csharp.sqs.writer
 taskRole=ecsTaskExecutionRole
 roleArn=$(aws iam list-roles | jq -r ".Roles[] | select(.RoleName==\"$taskRole\") | .Arn")
 
@@ -98,6 +98,8 @@ function push_image_and_create_task_definition(){
 		if [ "$1" = "$sqsWriterProjectName" ]
 		then
 			echo "Endpoint: http://$ipAddress:5100"
+		else
+			echo "Endpoint: http://$ipAddress:5200"
 		fi
 	fi
 
@@ -105,4 +107,4 @@ function push_image_and_create_task_definition(){
 }
 
 push_image_and_create_task_definition $sqsReaderProjectName $sqsReaderRepository
-push_image_and_create_task_definition $sqsWriterProjectName $sqsReaderRepository
+push_image_and_create_task_definition $sqsWriterProjectName $sqsWriterRepository
