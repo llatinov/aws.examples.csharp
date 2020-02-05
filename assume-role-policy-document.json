@@ -4,7 +4,13 @@
 		{
 			"Effect": "Allow",
 			"Principal": {
-				"Service": "lambda.amazonaws.com"
+				"Service": [
+					"lambda.amazonaws.com",
+					"ec2.amazonaws.com",
+					"ecs.amazonaws.com",
+					"ecs-tasks.amazonaws.com",
+					"batch.amazonaws.com"
+				]
 			},
 			"Action": "sts:AssumeRole"
 		}

@@ -1,33 +1,35 @@
-export AWS_ACCESS_KEY_ID=$AwsAccessKey
-export AWS_SECRET_ACCESS_KEY=$AwsSecretKey
-export AWS_DEFAULT_REGION=$AwsRegion
-
-roleName=lambda-admin-role
-policyName=AdministratorAccess
-actorsLambda=ActorsLambdaFunction
-moviesLambda=MoviesLambdaFunction
-actorsTable=Actors
-moviesTable=Movies
-entriesTable=LogEntries
+dos2unix configure-environment.sh
+source ./configure-environment.sh
 
 function delete_lambda() {
 	for mapping in $(aws lambda list-event-source-mappings --function-name $1 | jq --compact-output ".EventSourceMappings[] | {UUID: .UUID}")
 	do
 		uuid=$(jq -r ".UUID" <<< $mapping)
-		aws lambda delete-event-source-mapping --uuid $uuid
+		echo "Deleting event source mapping $uuid..."
+		result=$(aws lambda delete-event-source-mapping --uuid $uuid)
+		echo "Event source mapping $uuid deleted"
 	done
 
-	aws lambda delete-function --function-name $1
+	echo "Deleting $1 lambda..."
+	result=$(aws lambda delete-function --function-name $1)
+	echo "Lambda $1 deleted"
 
 	MSYS_NO_PATHCONV=1 aws logs delete-log-group --log-group-name /aws/lambda/$1
 }
 
 delete_lambda $actorsLambda
-
 delete_lambda $moviesLambda
 
-aws dynamodb delete-table --table-name $actorsTable
+echo "Deleting $actorsTable table..."
+result=$(aws dynamodb delete-table --table-name $actorsTable)
+echo "Table $actorsTable deleted"
+echo "Deleting $moviesTable table..."
+result=$(aws dynamodb delete-table --table-name $moviesTable)
+echo "Table $moviesTable deleted"
+echo "Deleting $entriesTable table..."
+result=$(aws dynamodb delete-table --table-name $entriesTable)
+echo "Table $entriesTable deleted"
 
-aws dynamodb delete-table --table-name $moviesTable
-
-aws dynamodb delete-table --table-name $entriesTable
+policyArn=$(aws iam list-policies | jq -r ".Policies[] | select(.PolicyName==\"$policyName\") | .Arn")
+aws iam detach-role-policy --role-name $roleName --policy-arn $policyArn
+aws iam delete-role --role-name $roleName

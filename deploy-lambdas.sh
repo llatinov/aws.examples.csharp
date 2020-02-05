@@ -1,49 +1,52 @@
-export AWS_ACCESS_KEY_ID=$AwsAccessKey
-export AWS_SECRET_ACCESS_KEY=$AwsSecretKey
-export AWS_DEFAULT_REGION=$AwsRegion
+dos2unix configure-environment.sh
+source ./configure-environment.sh
 
-roleName=lambda-admin-role
-policyName=AdministratorAccess
 timeout=30
 lambdasZipFile=DynamoDbLambdas/src/DynamoDbLambdas/bin/Release/netcoreapp2.1/DynamoDbLambdas.zip
 actorsLambda=ActorsLambdaFunction
-actorsTable=Actors
 actorsHandler=DynamoDbLambdas::DynamoDbLambdas.ActorsFunction::FunctionHandler
 moviesLambda=MoviesLambdaFunction
-moviesTable=Movies
 moviesHandler=DynamoDbLambdas::DynamoDbLambdas.MoviesFunction::FunctionHandler
-entriesTable=LogEntries
 
 actorsStreamArn=$(aws dynamodb describe-table --table-name $actorsTable | jq -r ".Table | select(.TableName==\"$actorsTable\") | .LatestStreamArn")
 if [ "$actorsStreamArn" = "" ]
 then
+	echo "Table $actorsTable does not exits, creating table..."
 	actorsStreamArn=$(aws dynamodb create-table \
 		--table-name $actorsTable \
 		--attribute-definitions 'AttributeName=Id,AttributeType=S' \
 		--key-schema 'AttributeName=Id,KeyType=HASH' \
 		--provisioned-throughput 'ReadCapacityUnits=5,WriteCapacityUnits=5' \
 		--stream-specification 'StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES' | jq -r ".TableDescription.LatestStreamArn")
+else
+	echo "Table $actorsTable exists"
 fi
 
 moviesStreamArn=$(aws dynamodb describe-table --table-name $moviesTable | jq -r ".Table | select(.TableName==\"$moviesTable\") | .LatestStreamArn")
 if [ "$moviesStreamArn" = "" ]
 then
+	echo "Table $moviesTable does not exits, creating table..."
 	moviesStreamArn=$(aws dynamodb create-table \
 		--table-name $moviesTable \
 		--attribute-definitions AttributeName=Title,AttributeType=S \
 		--key-schema AttributeName=Title,KeyType=HASH \
 		--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5 \
 		--stream-specification StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES | jq -r ".TableDescription.LatestStreamArn")
+else
+	echo "Table $moviesTable exists"
 fi
 
 entriesArn=$(aws dynamodb describe-table --table-name $entriesTable | jq -r ".Table | select(.TableName==\"$entriesTable\") | .Arn")
 if [ "$entriesArn" = "" ]
 then
-	aws dynamodb create-table \
+	echo "Table $entriesTable does not exits, creating table..."
+	result=$(aws dynamodb create-table \
 		--table-name $entriesTable \
 		--attribute-definitions AttributeName=Message,AttributeType=S AttributeName=DateTime,AttributeType=S \
 		--key-schema AttributeName=Message,KeyType=HASH AttributeName=DateTime,KeyType=RANGE \
-		--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5
+		--provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5)
+else
+	echo "Table $entriesTable exists"
 fi
 
 roleArn=$(aws iam list-roles | jq -r ".Roles[] | select(.RoleName==\"$roleName\") | .Arn")
@@ -66,33 +69,39 @@ function create_or_update_lambda() {
 	if [ "$functionArn" = "" ]
 	then
 		echo "Function $1 does not exist, creating function..."
-		aws lambda create-function \
+		result=$(aws lambda create-function \
 			--function-name $1 \
 			--runtime dotnetcore2.1 \
 			--role $roleArn \
 			--handler $2 \
 			--environment "Variables={AWS_SQS_QUEUE_NAME=$AwsQueueName, AWS_SQS_IS_FIFO=$AwsQueueIsFifo}" \
 			--timeout $timeout \
-			--zip-file fileb://$lambdasZipFile
-		aws lambda create-event-source-mapping \
+			--zip-file fileb://$lambdasZipFile)
+		echo "Function $1 created"
+		result=$(aws lambda create-event-source-mapping \
 			--function-name $1 \
 			--event-source-arn $3 \
-			--starting-position LATEST
+			--starting-position LATEST)
+		echo "Event sorucing to $3 created"
 	else
 		echo "Function $1 exists, updating function..."
-		aws lambda update-function-code \
+		result=$(aws lambda update-function-code \
 			--function-name $1 \
-			--zip-file fileb://$lambdasZipFile
-		aws lambda update-function-configuration \
+			--zip-file fileb://$lambdasZipFile)
+		echo "Function $1 code updated"
+		result=$(aws lambda update-function-configuration \
 			--function-name $1 \
 			--role $roleArn \
 			--handler $2 \
 			--environment "Variables={AWS_SQS_QUEUE_NAME=$AwsQueueName, AWS_SQS_IS_FIFO=$AwsQueueIsFifo}" \
-			--timeout $timeout
+			--timeout $timeout)
+		echo "Function $1 configuration updated"
 	fi
 }
 
-dotnet lambda package --project-location DynamoDbLambdas/src/DynamoDbLambdas
+echo "Building and packaging lambda..."
+result=$(dotnet lambda package --project-location DynamoDbLambdas/src/DynamoDbLambdas)
+echo "Lambda packaged to $lambdasZipFile file"
 
 create_or_update_lambda $actorsLambda $actorsHandler $actorsStreamArn
 create_or_update_lambda $moviesLambda $moviesHandler $moviesStreamArn
