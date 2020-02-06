@@ -1,8 +1,8 @@
-using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
+using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using Models;
 
@@ -11,34 +11,47 @@ namespace DynamoDbServerless
     public class ActorsHandler
     {
         private readonly IDynamoDbReader _dynamoDbReader;
+        private readonly IJsonConverter _jsonConverter;
 
-        public ActorsHandler() : this(null)
+        public ActorsHandler() : this(null, null)
         {
         }
 
-        public ActorsHandler(IDynamoDbReader dynamoDbReader = null)
+        public ActorsHandler(IDynamoDbReader dynamoDbReader, IJsonConverter jsonConverter)
         {
             _dynamoDbReader = dynamoDbReader ?? new DynamoDbReader();
+            _jsonConverter = jsonConverter ?? new JsonConverter();
         }
 
-        public async Task<ActorsSearchResponse> QueryActors(ActorsSearchRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> QueryActors(APIGatewayProxyRequest request, ILambdaContext context)
         {
-            var queryRequest = BuildQueryRequest(request.FirstName, request.LastName);
-            var response = await _dynamoDbReader.QueryAsync(queryRequest);
-            var results = BuildActorsResponse(response);
-            var responseJson = _dynamoDbReader.SerializeObject(response);
-            context.Logger.LogLine($"Query result: {responseJson}");
+            context.Logger.LogLine($"Query request: {_jsonConverter.SerializeObject(request)}");
 
-            return results;
+            var requestBody = _jsonConverter.DeserializeObject<ActorsSearchRequest>(request.Body);
+            if (string.IsNullOrEmpty(requestBody.FirstName))
+            {
+                return new APIGatewayProxyResponse
+                {
+                    StatusCode = (int)HttpStatusCode.BadRequest,
+                    Body = "FirstName is mandatory"
+                };
+            }
+            var queryRequest = BuildQueryRequest(requestBody.FirstName, requestBody.LastName);
+
+            var response = await _dynamoDbReader.QueryAsync(queryRequest);
+            context.Logger.LogLine($"Query result: {_jsonConverter.SerializeObject(response)}");
+
+            var queryResults = BuildActorsResponse(response);
+
+            return new APIGatewayProxyResponse
+            {
+                StatusCode = (int)HttpStatusCode.OK,
+                Body = _jsonConverter.SerializeObject(queryResults)
+            };
         }
 
         private static QueryRequest BuildQueryRequest(string firstName, string lastName)
         {
-            if (string.IsNullOrEmpty(firstName))
-            {
-                throw new Exception("FirstName is mandatory");
-            }
-
             var request = new QueryRequest("Actors")
             {
                 KeyConditionExpression = "FirstName = :FirstName"

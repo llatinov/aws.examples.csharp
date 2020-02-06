@@ -13,7 +13,7 @@ namespace DynamoDbLambdas
 
         public ActorsFunction() : this(null, null) { }
 
-        public ActorsFunction(ISqsWriter sqsWriter = null, IDynamoDbWriter dynamoDbWriter = null)
+        public ActorsFunction(ISqsWriter sqsWriter, IDynamoDbWriter dynamoDbWriter)
         {
             _sqsWriter = sqsWriter ?? new SqsWriter();
             _dynamoDbWriter = dynamoDbWriter ?? new DynamoDbWriter();

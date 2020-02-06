@@ -15,6 +15,10 @@ package:
 functions:
   actors:
     handler: CsharpHandlers::DynamoDbServerless.ActorsHandler::QueryActors
+    events:
+      - http:
+          path: actors/search
+          method: post
 
     package:
       artifact: bin/release/netcoreapp2.1/DynamoDbServerless.zip

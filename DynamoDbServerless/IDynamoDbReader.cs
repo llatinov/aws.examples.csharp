@@ -6,6 +6,5 @@ namespace DynamoDbServerless
     public interface IDynamoDbReader
     {
         Task<QueryResponse> QueryAsync(QueryRequest queryRequest);
-        string SerializeObject(object obj);
     }
 }
