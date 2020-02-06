@@ -14,8 +14,8 @@ then
 	echo "Table $actorsTable does not exits, creating table..."
 	actorsStreamArn=$(aws dynamodb create-table \
 		--table-name $actorsTable \
-		--attribute-definitions 'AttributeName=Id,AttributeType=S' \
-		--key-schema 'AttributeName=Id,KeyType=HASH' \
+		--attribute-definitions 'AttributeName=FirstName,AttributeType=S' 'AttributeName=LastName,AttributeType=S' \
+		--key-schema 'AttributeName=FirstName,KeyType=HASH' 'AttributeName=LastName,KeyType=RANGE' \
 		--provisioned-throughput 'ReadCapacityUnits=5,WriteCapacityUnits=5' \
 		--stream-specification 'StreamEnabled=true,StreamViewType=NEW_AND_OLD_IMAGES' | jq -r ".TableDescription.LatestStreamArn")
 else

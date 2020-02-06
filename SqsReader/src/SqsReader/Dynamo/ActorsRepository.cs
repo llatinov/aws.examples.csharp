@@ -26,15 +26,25 @@ namespace SqsReader.Dynamo
                 {
                     new KeySchemaElement
                     {
-                        AttributeName = "Id",
+                        AttributeName = "FirstName",
                         KeyType = "HASH"
+                    },
+                    new KeySchemaElement
+                    {
+                        AttributeName = "LastName",
+                        KeyType = "RANGE"
                     }
                 },
                 AttributeDefinitions = new List<AttributeDefinition>
                 {
+                   new AttributeDefinition
+                    {
+                        AttributeName = "FirstName",
+                        AttributeType = "S"
+                    },
                     new AttributeDefinition
                     {
-                        AttributeName = "Id",
+                        AttributeName = "LastName",
                         AttributeType = "S"
                     }
                 },
@@ -60,7 +70,6 @@ namespace SqsReader.Dynamo
                 TableName = TableName,
                 Item = new Dictionary<string, AttributeValue>
                 {
-                    {"Id", new AttributeValue {S = actor.FirstName + actor.LastName}},
                     {"FirstName", new AttributeValue {S = actor.FirstName}},
                     {"LastName", new AttributeValue {S = actor.LastName}}
                 }
