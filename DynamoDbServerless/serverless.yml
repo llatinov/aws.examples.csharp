@@ -8,17 +8,21 @@ provider:
       Action:
         - dynamodb:Query
       Resource: ${env:actorsTableArn}
+  apiKeys:
+    - aws-examples-csharp-api-key
 
 package:
   individually: true
+  artifact: bin/release/netcoreapp2.1/DynamoDbServerless.zip
 
 functions:
   actors:
-    handler: CsharpHandlers::DynamoDbServerless.ActorsHandler::QueryActors
+    handler: CsharpHandlers::DynamoDbServerless.Handlers.ActorsHandler::QueryActors
     events:
       - http:
           path: actors/search
           method: post
-
-    package:
-      artifact: bin/release/netcoreapp2.1/DynamoDbServerless.zip
+          private: true
+          authorizer: authorizer
+  authorizer:
+    handler: CsharpHandlers::DynamoDbServerless.Handlers.AuthorizationHandler::Authorize

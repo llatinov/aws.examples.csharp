@@ -4,9 +4,11 @@ using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
+using DynamoDbServerless.Models;
+using DynamoDbServerless.Services;
 using Models;
 
-namespace DynamoDbServerless
+namespace DynamoDbServerless.Handlers
 {
     public class ActorsHandler
     {

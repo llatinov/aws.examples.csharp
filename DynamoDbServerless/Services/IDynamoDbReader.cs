@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Amazon.DynamoDBv2.Model;
 
-namespace DynamoDbServerless
+namespace DynamoDbServerless.Services
 {
     public interface IDynamoDbReader
     {

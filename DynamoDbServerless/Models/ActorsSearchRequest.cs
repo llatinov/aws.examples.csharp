@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace DynamoDbServerless
+namespace DynamoDbServerless.Models
 {
     public class ActorsSearchRequest
     {

@@ -4,7 +4,7 @@ using Amazon;
 using Amazon.DynamoDBv2;
 using Amazon.DynamoDBv2.Model;
 
-namespace DynamoDbServerless
+namespace DynamoDbServerless.Services
 {
     public class DynamoDbReader : IDynamoDbReader
     {

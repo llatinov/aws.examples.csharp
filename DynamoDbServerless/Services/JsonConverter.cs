@@ -3,7 +3,7 @@ using Amazon.Lambda.Core;
 using Newtonsoft.Json;
 
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
-namespace DynamoDbServerless
+namespace DynamoDbServerless.Services
 {
     public class JsonConverter : IJsonConverter
     {

@@ -1,4 +1,4 @@
-﻿namespace DynamoDbServerless
+﻿namespace DynamoDbServerless.Services
 {
     public interface IJsonConverter
     {
