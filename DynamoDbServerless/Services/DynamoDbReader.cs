@@ -23,5 +23,10 @@ namespace DynamoDbServerless.Services
         {
             return await _dynamoDbClient.QueryAsync(queryRequest);
         }
+
+        public async Task<GetItemResponse> GetItemAsync(GetItemRequest getItemRequest)
+        {
+            return await _dynamoDbClient.GetItemAsync(getItemRequest);
+        }
     }
 }

@@ -8,6 +8,10 @@ provider:
       Action:
         - dynamodb:Query
       Resource: ${env:actorsTableArn}
+    - Effect: "Allow"
+      Action:
+        - dynamodb:GetItem
+      Resource: ${env:moviesTableArn}
   apiKeys:
     - aws-examples-csharp-api-key
 
@@ -16,6 +20,13 @@ package:
   artifact: bin/release/netcoreapp2.1/DynamoDbServerless.zip
 
 functions:
+  movies:
+    handler: CsharpHandlers::DynamoDbServerless.Handlers.MoviesHandler::GetMoviesByGenre
+    events:
+      - http:
+          path: movies/title/{title}
+          method: get
+
   actors:
     handler: CsharpHandlers::DynamoDbServerless.Handlers.ActorsHandler::QueryActors
     events:
@@ -24,5 +35,6 @@ functions:
           method: post
           private: true
           authorizer: authorizer
+
   authorizer:
     handler: CsharpHandlers::DynamoDbServerless.Handlers.AuthorizationHandler::Authorize

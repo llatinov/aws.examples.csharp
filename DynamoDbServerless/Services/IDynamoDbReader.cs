@@ -6,5 +6,6 @@ namespace DynamoDbServerless.Services
     public interface IDynamoDbReader
     {
         Task<QueryResponse> QueryAsync(QueryRequest queryRequest);
+        Task<GetItemResponse> GetItemAsync(GetItemRequest getItemRequest);
     }
 }
