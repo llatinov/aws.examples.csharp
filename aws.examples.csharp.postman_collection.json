@@ -1,0 +1,321 @@
+{
+	"info": {
+		"_postman_id": "1d3ba356-6cd7-4015-aaa1-3c647f82a25e",
+		"name": "aws.examples.csharp",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SqsWriterHealthCheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5100/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5100",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SqsWriterHealthCheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5100/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5100",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PublishMovie",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"Title\": \"Die Hard\",\n\t\"Genre\": \"Action Movie\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5100/api/publish/movie",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5100",
+					"path": [
+						"api",
+						"publish",
+						"movie"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "PublishActor",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n\t\"FirstName\": \"Bruce\",\n\t\"LastName\": \"Willis\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:5100/api/publish/actor",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5100",
+					"path": [
+						"api",
+						"publish",
+						"actor"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConsumerStart",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5200/api/consumer/start",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5200",
+					"path": [
+						"api",
+						"consumer",
+						"start"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConsumerStop",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5200/api/consumer/stop",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5200",
+					"path": [
+						"api",
+						"consumer",
+						"stop"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConsumerStatus",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5200/api/consumer/status",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5200",
+					"path": [
+						"api",
+						"consumer",
+						"status"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ConsumerReprocess",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"type": "text",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "http://localhost:5200/api/consumer/reprocess",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5200",
+					"path": [
+						"api",
+						"consumer",
+						"reprocess"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ServerlessActors",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"name": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					},
+					{
+						"key": "x-api-key",
+						"value": "TEqfCnmXePaltIHHSdnQm6L578MSO6cd1buhgVkt",
+						"type": "text"
+					},
+					{
+						"key": "Authorization",
+						"value": "Bearer validToken",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"FirstName\": \"Bruce\",\n    \"LastName\": \"Willis\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://jy01t9xvc6.execute-api.eu-central-1.amazonaws.com/dev/actors/search",
+					"protocol": "https",
+					"host": [
+						"jy01t9xvc6",
+						"execute-api",
+						"eu-central-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"actors",
+						"search"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "ServerlessMovies",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://jy01t9xvc6.execute-api.eu-central-1.amazonaws.com/dev/movies/title/Die Hard",
+					"protocol": "https",
+					"host": [
+						"jy01t9xvc6",
+						"execute-api",
+						"eu-central-1",
+						"amazonaws",
+						"com"
+					],
+					"path": [
+						"dev",
+						"movies",
+						"title",
+						"Die Hard"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "2bc284b9-0eb1-4759-af69-375d64a42136",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "c6ff2892-e9cf-4e5a-906f-557a3a0843e3",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"protocolProfileBehavior": {}
+}

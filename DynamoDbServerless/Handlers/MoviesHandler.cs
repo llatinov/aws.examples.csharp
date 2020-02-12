@@ -11,6 +11,8 @@ namespace DynamoDbServerless.Handlers
 {
     public class MoviesHandler
     {
+        private const string TitleKey = "Title";
+
         private readonly IDynamoDbReader _dynamoDbReader;
         private readonly IJsonConverter _jsonConverter;
 
@@ -33,15 +35,20 @@ namespace DynamoDbServerless.Handlers
             var getItemResponse = await _dynamoDbReader.GetItemAsync(getItemRequest);
             context.Logger.LogLine($"Query response: {_jsonConverter.SerializeObject(getItemResponse)}");
 
-            var response = new Movie
+            if (!getItemResponse.Item.ContainsKey(TitleKey))
             {
-                Title = getItemResponse.Item["Title"].S,
+                return new APIGatewayProxyResponse { StatusCode = (int)HttpStatusCode.NotFound };
+            }
+
+            var movie = new Movie
+            {
+                Title = getItemResponse.Item[TitleKey].S,
                 Genre = (MovieGenre)int.Parse(getItemResponse.Item["Genre"].N)
             };
             return new APIGatewayProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
-                Body = _jsonConverter.SerializeObject(response)
+                Body = _jsonConverter.SerializeObject(movie)
             };
         }
 
