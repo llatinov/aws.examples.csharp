@@ -1,6 +1,21 @@
 service: DynamoDbServerless
 
+plugins:
+  - serverless-localstack
+
+custom:
+  localstack:
+    stages:
+      - local
+    autostart: true
+    lambda:
+      mountCode: False
+    docker:
+      sudo: False
+
 provider:
+  deploymentBucket:
+    name: ${env:localstackBucket}
   name: aws
   runtime: dotnetcore2.1
   iamRoleStatements:

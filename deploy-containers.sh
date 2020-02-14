@@ -8,6 +8,26 @@ then
 	alias docker='docker -H tcp://0.0.0.0:2375'
 fi
 
+function create_queue() {
+	queueName=$1
+	if [ "$AwsQueueIsFifo" = "true" ]
+	then
+		queueName=$queueName".fifo"
+	fi
+	queueUrl=$(aws sqs list-queues | jq -r ".QueueUrls[] | select(endswith(\"$1\"))")
+	if [ "$queueUrl" = "" ]
+	then
+		queueUrl=$(aws sqs create-queue --queue-name $1 | jq -r ".QueueUrl")
+	fi
+	echo "$queueUrl"
+}
+
+queueUrl=$(create_queue $AwsQueueName)
+deadLetterQueueUrl=$(create_queue $AwsQueueName"-exceptions")
+deadLetterQueueArn=$(aws sqs get-queue-attributes --queue-url $deadLetterQueueUrl --attribute-names QueueArn | jq -r ".Attributes.QueueArn")
+aws sqs set-queue-attributes --queue-url $queueUrl --attributes "{\"RedrivePolicy\":\"{\\\"maxReceiveCount\\\":\\\"3\\\",\\\"deadLetterTargetArn\\\":\\\"$deadLetterQueueArn\\\"}\",\"ReceiveMessageWaitTimeSeconds\":\"$AwsQueueLongPollTimeSeconds\"}"
+echo "RedrivePolicy set to queue $queueUrl"
+
 roleArn=$(aws iam list-roles | jq -r ".Roles[] | select(.RoleName==\"$roleName\") | .Arn")
 if [ "$roleArn" = "" ]
 then
@@ -34,13 +54,16 @@ else
 	echo "Cluster $clusterName exists"
 fi
 
+function ip_permission() {
+	echo "{\"IpProtocol\": \"tcp\", \"FromPort\": $1, \"ToPort\": $1, \"IpRanges\": [{\"CidrIp\": \"0.0.0.0/0\", \"Description\": \"Port $1\"}]}"
+}
 securityGroupId=$(aws ec2 describe-security-groups | jq -r ".SecurityGroups[] | select(.GroupName==\"$securityGroup\") | .GroupId")
 if [ "$securityGroupId" = "" ]
 then
 	securityGroupId=$(aws ec2 create-security-group --description $securityGroup --group-name $securityGroup | jq -r ".GroupId")
 	aws ec2 authorize-security-group-ingress \
 		--group-id $securityGroupId \
-		--ip-permissions '[{"IpProtocol": "tcp", "FromPort": 5100, "ToPort": 5100, "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "Port 5100"}]},{"IpProtocol": "tcp", "FromPort": 5200, "ToPort": 5200, "IpRanges": [{"CidrIp": "0.0.0.0/0", "Description": "Port 5200"}]}]'
+		--ip-permissions "[$(ip_permission $sqsWriterPort),$(ip_permission $sqsReaderPort)]"
 else
 	echo "Security group $securityGroup exists"
 fi
@@ -135,9 +158,9 @@ function push_image_and_create_task_definition(){
 	ipAddress=$(aws ec2 describe-network-interfaces --filters "Name=network-interface-id,Values=$networkInterfaceId" | jq -r ".NetworkInterfaces[0].Association.PublicIp")
 	if [ "$1" = "$sqsWriterProjectName" ]
 	then
-		echo "$1 endpoint: http://$ipAddress:5100"
+		echo "$1 endpoint: http://$ipAddress:$sqsWriterPort"
 	else
-		echo "$1 endpoint: http://$ipAddress:5200"
+		echo "$1 endpoint: http://$ipAddress:$sqsReaderPort"
 	fi
 
 	cd .. && cd .. && cd ..

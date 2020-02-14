@@ -1,0 +1,1 @@
+docker-compose -f local-docker-compose-localstack.yml down
