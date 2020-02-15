@@ -6,8 +6,6 @@ namespace SqsReader
         private string _queueName;
 
         public string AwsRegion { get; set; }
-        public string AwsSqsServiceUrl { get; set; }
-        public string AwsDynamoServiceUrl { get; set; }
         public string AwsAccessKey { get; set; }
         public string AwsSecretKey { get; set; }
         public string AwsQueueName
@@ -27,5 +25,6 @@ namespace SqsReader
         public bool AwsQueueAutomaticallyCreate { get; set; }
         public bool AwsQueueIsFifo { get; set; }
         public int AwsQueueLongPollTimeSeconds { get; set; }
+        public string LocalstackHostname { get; set; }
     }
 }

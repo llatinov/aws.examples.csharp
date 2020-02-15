@@ -6,11 +6,7 @@ services:
     ports:
       - 5200:5200
     environment:
-      - AwsSqsServiceUrl=http://host.docker.internal:4576
-      - AwsDynamoServiceUrl=http://host.docker.internal:4569
-      - AwsRegion
-      - AwsAccessKey
-      - AwsSecretKey
+      - LocalstackHostname=host.docker.internal
       - AwsQueueName
       - AwsQueueIsFifo
       - AwsQueueLongPollTimeSeconds
@@ -21,10 +17,7 @@ services:
     ports:
       - 5100:5100
     environment:
-      - AwsSqsServiceUrl=http://host.docker.internal:4576
-      - AwsRegion
-      - AwsAccessKey
-      - AwsSecretKey
+      - LocalstackHostname=host.docker.internal
       - AwsQueueName
       - AwsQueueIsFifo
       - AwsQueueLongPollTimeSeconds
