@@ -34,7 +34,12 @@ cd DynamoDbServerless
 dos2unix build.sh
 echo "Building and packaging lambda..."
 result=$(./build.sh)
-echo "Lambda packaged"
+if [[ $result == *"error"* ]]; then
+	echo "ERROR during lambda build"
+	echo $result
+else
+	echo "Lambda packaged"
+fi
 
 sls deploy --region $AwsRegion
 

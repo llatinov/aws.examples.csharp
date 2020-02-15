@@ -6,7 +6,7 @@ services:
     ports:
       - 5200:5200
     environment:
-      - LocalstackHostname=host.docker.internal
+      - LocalstackHostname=172.17.0.1
       - AwsQueueName
       - AwsQueueIsFifo
       - AwsQueueLongPollTimeSeconds
@@ -17,7 +17,7 @@ services:
     ports:
       - 5100:5100
     environment:
-      - LocalstackHostname=host.docker.internal
+      - LocalstackHostname=172.17.0.1
       - AwsQueueName
       - AwsQueueIsFifo
       - AwsQueueLongPollTimeSeconds

@@ -105,7 +105,12 @@ function create_or_update_lambda() {
 
 echo "Building and packaging lambda..."
 result=$(dotnet lambda package --project-location DynamoDbLambdas/src/DynamoDbLambdas)
-echo "Lambda packaged to $lambdasZipFile file"
+if [[ $result == *"error"* ]]; then
+	echo "ERROR during lambda build"
+	echo $result
+else
+	echo "Lambda packaged to $lambdasZipFile file"
+fi
 
 create_or_update_lambda $actorsLambda $actorsHandler $actorsStreamArn
 create_or_update_lambda $moviesLambda $moviesHandler $moviesStreamArn
