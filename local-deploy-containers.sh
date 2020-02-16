@@ -1,12 +1,6 @@
 dos2unix local-configure-environment.sh
 source ./local-configure-environment.sh
 
-function cleanup {
-	docker-compose -f local-docker-compose-containers.yml down
-}
-
-trap cleanup EXIT
-
 function create_queue() {
 	queueName=$1
 	if [ "$AwsQueueIsFifo" = "true" ]
@@ -27,5 +21,7 @@ deadLetterQueueArn=$(aws sqs get-queue-attributes --queue-url $deadLetterQueueUr
 aws sqs set-queue-attributes --queue-url $queueUrl --attributes "{\"RedrivePolicy\":\"{\\\"maxReceiveCount\\\":\\\"3\\\",\\\"deadLetterTargetArn\\\":\\\"$deadLetterQueueArn\\\"}\",\"ReceiveMessageWaitTimeSeconds\":\"$AwsQueueLongPollTimeSeconds\"}" --endpoint-url=http://localhost:4576
 echo "RedrivePolicy set to queue $queueUrl"
 
-docker-compose -f local-docker-compose-containers.yml build
+echo "Building docker images..."
+result=$(docker-compose -f local-docker-compose-containers.yml build)
+echo "Docker build is ready"
 docker-compose -f local-docker-compose-containers.yml up

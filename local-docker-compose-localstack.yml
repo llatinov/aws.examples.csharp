@@ -11,7 +11,8 @@ services:
       - PORT_WEB_UI=9090
       - LAMBDA_EXECUTOR=docker
       - LAMBDA_REMOTE_DOCKER=0
+      - HOST_TMP_FOLDER=${TMP_FOLDER}
       - DOCKER_HOST=unix:///var/run/docker.sock
     volumes:
-      - "${TMPDIR:-/tmp/localstack}:/tmp/localstack"
+      - "${TMP_FOLDER}:/tmp/localstack"
       - "/var/run/docker.sock:/var/run/docker.sock"
