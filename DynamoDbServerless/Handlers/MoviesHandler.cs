@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using Amazon.DynamoDBv2.Model;
 using Amazon.Lambda.APIGatewayEvents;
 using Amazon.Lambda.Core;
 using DynamoDbServerless.Services;
@@ -11,7 +9,7 @@ namespace DynamoDbServerless.Handlers
 {
     public class MoviesHandler
     {
-        private const string TitleKey = "Title";
+        private const string TableName = "Movies";
 
         private readonly IDynamoDbReader _dynamoDbReader;
         private readonly IJsonConverter _jsonConverter;
@@ -26,41 +24,28 @@ namespace DynamoDbServerless.Handlers
             _jsonConverter = jsonConverter ?? new JsonConverter();
         }
 
-        public async Task<APIGatewayProxyResponse> GetMoviesByGenre(APIGatewayProxyRequest request, ILambdaContext context)
+        public async Task<APIGatewayProxyResponse> GetMovie(APIGatewayProxyRequest request, ILambdaContext context)
         {
             context.Logger.LogLine($"Query request: {_jsonConverter.SerializeObject(request)}");
 
             var title = WebUtility.UrlDecode(request.PathParameters["title"]);
-            var getItemRequest = BuildGetItemRequest(title);
-            var getItemResponse = await _dynamoDbReader.GetItemAsync(getItemRequest);
-            context.Logger.LogLine($"Query response: {_jsonConverter.SerializeObject(getItemResponse)}");
+            var document = await _dynamoDbReader.GetDocumentAsync(TableName, title);
+            context.Logger.LogLine($"Query response: {_jsonConverter.SerializeObject(document)}");
 
-            if (!getItemResponse.Item.ContainsKey(TitleKey))
+            if (document == null)
             {
                 return new APIGatewayProxyResponse { StatusCode = (int)HttpStatusCode.NotFound };
             }
 
             var movie = new Movie
             {
-                Title = getItemResponse.Item[TitleKey].S,
-                Genre = (MovieGenre)int.Parse(getItemResponse.Item["Genre"].N)
+                Title = document["Title"],
+                Genre = (MovieGenre)int.Parse(document["Genre"])
             };
             return new APIGatewayProxyResponse
             {
                 StatusCode = (int)HttpStatusCode.OK,
                 Body = _jsonConverter.SerializeObject(movie)
-            };
-        }
-
-        private static GetItemRequest BuildGetItemRequest(string title)
-        {
-            return new GetItemRequest
-            {
-                TableName = "Movies",
-                Key = new Dictionary<string, AttributeValue>
-                {
-                    {"Title", new AttributeValue {S = title}}
-                }
             };
         }
     }

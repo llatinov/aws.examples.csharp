@@ -6,7 +6,8 @@ namespace SqsReader.Dynamo
 {
     public class DatabaseClient : IDatabaseClient
     {
-        private const string UnknownStatus = "UNKNOWN";
+        private const string StatusUnknown = "UNKNOWN";
+        private const string StatusActive = "ACTIVE";
 
         private readonly IAmazonDynamoDB _client;
 
@@ -15,15 +16,10 @@ namespace SqsReader.Dynamo
             _client = client;
         }
 
-        public IAmazonDynamoDB GetClient()
-        {
-            return _client;
-        }
-
         public async Task CreateTableAsync(CreateTableRequest createTableRequest)
         {
             var status = await GetTableStatusAsync(createTableRequest.TableName);
-            if (status != UnknownStatus)
+            if (status != StatusUnknown)
             {
                 return;
             }
@@ -33,7 +29,12 @@ namespace SqsReader.Dynamo
             await WaitUntilTableReady(createTableRequest.TableName);
         }
 
-        public async Task<string> GetTableStatusAsync(string tableName)
+        public async Task PutItemAsync(PutItemRequest putItemRequest)
+        {
+            await _client.PutItemAsync(putItemRequest);
+        }
+
+        private async Task<string> GetTableStatusAsync(string tableName)
         {
             try
             {
@@ -45,19 +46,14 @@ namespace SqsReader.Dynamo
             }
             catch (ResourceNotFoundException)
             {
-                return UnknownStatus;
+                return StatusUnknown;
             }
-        }
-
-        public async Task PutItemAsync(PutItemRequest putItemRequest)
-        {
-            await _client.PutItemAsync(putItemRequest);
         }
 
         private async Task WaitUntilTableReady(string tableName)
         {
             var status = await GetTableStatusAsync(tableName);
-            for (var i = 0; i < 10 && status != "ACTIVE"; ++i)
+            for (var i = 0; i < 10 && status != StatusActive; ++i)
             {
                 await Task.Delay(500);
                 status = await GetTableStatusAsync(tableName);

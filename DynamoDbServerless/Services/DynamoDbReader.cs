@@ -2,6 +2,7 @@
 using System.Threading.Tasks;
 using Amazon;
 using Amazon.DynamoDBv2;
+using Amazon.DynamoDBv2.DocumentModel;
 using Amazon.DynamoDBv2.Model;
 using Amazon.Runtime;
 
@@ -36,9 +37,10 @@ namespace DynamoDbServerless.Services
             return await _dynamoDbClient.QueryAsync(queryRequest);
         }
 
-        public async Task<GetItemResponse> GetItemAsync(GetItemRequest getItemRequest)
+        public async Task<Document> GetDocumentAsync(string tableName, string documentKey)
         {
-            return await _dynamoDbClient.GetItemAsync(getItemRequest);
+            var table = Table.LoadTable(_dynamoDbClient, new TableConfig(tableName));
+            return await table.GetItemAsync(new Primitive(documentKey));
         }
     }
 }

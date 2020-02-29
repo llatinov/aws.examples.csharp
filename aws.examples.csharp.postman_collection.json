@@ -6,44 +6,6 @@
 	},
 	"item": [
 		{
-			"name": "SqsWriterHealthCheck",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:5100/health",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5100",
-					"path": [
-						"health"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "SqsWriterHealthCheck",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:5100/health",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "5100",
-					"path": [
-						"health"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "PublishMovie",
 			"request": {
 				"method": "POST",
@@ -100,6 +62,25 @@
 						"api",
 						"publish",
 						"actor"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "SqsWriterHealthCheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5100/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5100",
+					"path": [
+						"health"
 					]
 				}
 			},
@@ -220,6 +201,25 @@
 			"response": []
 		},
 		{
+			"name": "SqsReaderHealthCheck",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5200/health",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5200",
+					"path": [
+						"health"
+					]
+				}
+			},
+			"response": []
+		},
+		{
 			"name": "ServerlessActors",
 			"request": {
 				"method": "POST",
@@ -232,7 +232,7 @@
 					},
 					{
 						"key": "x-api-key",
-						"value": "TEqfCnmXePaltIHHSdnQm6L578MSO6cd1buhgVkt",
+						"value": "CHANGE_ME",
 						"type": "text"
 					},
 					{
@@ -251,12 +251,12 @@
 					}
 				},
 				"url": {
-					"raw": "https://jy01t9xvc6.execute-api.eu-central-1.amazonaws.com/dev/actors/search",
+					"raw": "https://CHANGE_ME.execute-api.REGION.amazonaws.com/dev/actors/search",
 					"protocol": "https",
 					"host": [
-						"jy01t9xvc6",
+						"CHANGE_ME",
 						"execute-api",
-						"eu-central-1",
+						"REGION",
 						"amazonaws",
 						"com"
 					],
@@ -281,11 +281,6 @@
 						"value": "application/json"
 					},
 					{
-						"key": "x-api-key",
-						"type": "text",
-						"value": "TEqfCnmXePaltIHHSdnQm6L578MSO6cd1buhgVkt"
-					},
-					{
 						"key": "Authorization",
 						"type": "text",
 						"value": "Bearer validToken"
@@ -301,7 +296,7 @@
 					}
 				},
 				"url": {
-					"raw": "http://localhost:4567/restapis/g2vdk7sy4w/local/_user_request_/actors/search",
+					"raw": "http://localhost:4567/restapis/CHANGE_ME/local/_user_request_/actors/search",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -309,7 +304,7 @@
 					"port": "4567",
 					"path": [
 						"restapis",
-						"g2vdk7sy4w",
+						"CHANGE_ME",
 						"local",
 						"_user_request_",
 						"actors",
@@ -325,12 +320,12 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "https://jy01t9xvc6.execute-api.eu-central-1.amazonaws.com/dev/movies/title/Die Hard",
+					"raw": "https://CHANGE_ME.execute-api.REGION.amazonaws.com/dev/movies/title/Die Hard",
 					"protocol": "https",
 					"host": [
-						"jy01t9xvc6",
+						"CHANGE_ME",
 						"execute-api",
-						"eu-central-1",
+						"REGION",
 						"amazonaws",
 						"com"
 					],
@@ -350,7 +345,7 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "http://localhost:4567/restapis/g2vdk7sy4w/local/_user_request_/movies/title/Die Hard",
+					"raw": "http://localhost:4567/restapis/CHANGE_ME/local/_user_request_/movies/title/Die Hard",
 					"protocol": "http",
 					"host": [
 						"localhost"
@@ -358,7 +353,7 @@
 					"port": "4567",
 					"path": [
 						"restapis",
-						"g2vdk7sy4w",
+						"CHANGE_ME",
 						"local",
 						"_user_request_",
 						"movies",

@@ -25,6 +25,7 @@ provider:
       Resource: ${env:actorsTableArn}
     - Effect: "Allow"
       Action:
+        - dynamodb:DescribeTable
         - dynamodb:GetItem
       Resource: ${env:moviesTableArn}
   apiKeys:
@@ -36,7 +37,7 @@ package:
 
 functions:
   movies:
-    handler: DynamoDbServerless::DynamoDbServerless.Handlers.MoviesHandler::GetMoviesByGenre
+    handler: DynamoDbServerless::DynamoDbServerless.Handlers.MoviesHandler::GetMovie
     events:
       - http:
           path: movies/title/{title}
