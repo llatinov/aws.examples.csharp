@@ -25,6 +25,5 @@ namespace SqsWriter
         public bool AwsQueueAutomaticallyCreate { get; set; }
         public bool AwsQueueIsFifo { get; set; }
         public int AwsQueueLongPollTimeSeconds { get; set; }
-        public string LocalstackHostname { get; set; }
     }
 }
