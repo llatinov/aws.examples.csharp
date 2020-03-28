@@ -25,8 +25,9 @@ namespace SqsReader.Services.Processors
 
         public async Task ProcessAsync(Message message)
         {
-            _logger.LogInformation($"MovieMessageProcessor invoked with: {message.Body}");
             var movie = JsonConvert.DeserializeObject<Movie>(message.Body);
+            _logger.LogInformation("MovieMessageProcessor invoked with {Title}, {@Content}",
+                movie.Title, movie);
             await _moviesRepository.SaveMovieAsync(movie);
         }
     }

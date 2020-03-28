@@ -27,7 +27,8 @@ namespace SqsReader.Services.Processors
         {
             var actor = JsonConvert.DeserializeObject<Actor>(message.Body);
             await _actorsRepository.SaveActorAsync(actor);
-            _logger.LogInformation($"ActorMessageProcessor invoked with: {message.Body}");
+            _logger.LogInformation("ActorMessageProcessor invoked with {FirstName} and {LastName}, {@Content}",
+                actor.FirstName, actor.LastName, actor);
         }
     }
 }

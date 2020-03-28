@@ -14,15 +14,17 @@ namespace DynamoDbServerless.Handlers
     {
         private readonly IDynamoDbReader _dynamoDbReader;
         private readonly IJsonConverter _jsonConverter;
+        private readonly ILogger _logger;
 
-        public ActorsHandler() : this(null, null)
+        public ActorsHandler() : this(null, null, null)
         {
         }
 
-        public ActorsHandler(IDynamoDbReader dynamoDbReader, IJsonConverter jsonConverter)
+        public ActorsHandler(IDynamoDbReader dynamoDbReader, IJsonConverter jsonConverter, ILogger logger)
         {
             _dynamoDbReader = dynamoDbReader ?? new DynamoDbReader();
             _jsonConverter = jsonConverter ?? new JsonConverter();
+            _logger = logger ?? new Logger();
         }
 
         public async Task<APIGatewayProxyResponse> QueryActors(APIGatewayProxyRequest request, ILambdaContext context)
@@ -39,11 +41,15 @@ namespace DynamoDbServerless.Handlers
                 };
             }
             var queryRequest = BuildQueryRequest(requestBody.FirstName, requestBody.LastName);
+            _logger.LogInformation("QueryActors invoked with {FirstName} and {LastName}, {@Content}",
+                requestBody.FirstName, requestBody.LastName, requestBody);
 
             var response = await _dynamoDbReader.QueryAsync(queryRequest);
             context.Logger.LogLine($"Query result: {_jsonConverter.SerializeObject(response)}");
 
             var queryResults = BuildActorsResponse(response);
+            _logger.LogInformation("QueryActors result for {FirstName} and {LastName} is {@Content}",
+                requestBody.FirstName, requestBody.LastName, queryResults);
 
             return new APIGatewayProxyResponse
             {

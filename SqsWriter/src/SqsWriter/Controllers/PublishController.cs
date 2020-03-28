@@ -26,7 +26,8 @@ namespace SqsWriter.Controllers
         public async Task<IActionResult> PublishMovie([FromBody]Movie movie)
         {
             await _sqsClient.PostMessageAsync(movie);
-            _logger.LogDebug("New Movie published with {Body}", JsonConvert.SerializeObject(movie));
+            _logger.LogInformation("New Movie published with {Title}, {@Content}",
+                 movie.Title, movie);
             return StatusCode((int)HttpStatusCode.Created);
         }
 
@@ -35,7 +36,8 @@ namespace SqsWriter.Controllers
         public async Task<IActionResult> PublishActor([FromBody]Actor actor)
         {
             await _sqsClient.PostMessageAsync(actor);
-            _logger.LogDebug("New Actor published with {Body}", JsonConvert.SerializeObject(actor));
+            _logger.LogInformation("New Actor published with {FirstName} and {LastName}, {@Content}",
+                actor.FirstName, actor.LastName, actor);
             return StatusCode((int)HttpStatusCode.Created);
         }
     }

@@ -21,7 +21,7 @@ namespace SqsReader.Services.Processors
 
         public Task ProcessAsync(Message message)
         {
-            _logger.LogInformation($"LogEntryMessageProcessor invoked with: {message.Body}");
+            _logger.LogInformation("LogEntryMessageProcessor invoked with {@Content}", message.Body);
             return Task.CompletedTask;
         }
     }

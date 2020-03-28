@@ -19,6 +19,7 @@ namespace DynamoDbLambdas.Tests
         private readonly TestLambdaContext _context;
         private readonly Mock<ISqsWriter> _sqsWriterMock;
         private readonly Mock<IDynamoDbWriter> _dynamoDbWriterMock;
+        private readonly Mock<ILogger> _loggerMock;
 
         public MoviesFunctionTest(ITestOutputHelper output)
         {
@@ -26,6 +27,7 @@ namespace DynamoDbLambdas.Tests
             _context = new TestLambdaContext();
             _sqsWriterMock = new Mock<ISqsWriter>();
             _dynamoDbWriterMock = new Mock<IDynamoDbWriter>();
+            _loggerMock = new Mock<ILogger>();
         }
 
         [Fact]
@@ -64,9 +66,9 @@ namespace DynamoDbLambdas.Tests
             }));
 
 
-            var function = new MoviesFunction(_sqsWriterMock.Object, _dynamoDbWriterMock.Object);
+            var function = new MoviesFunction(_sqsWriterMock.Object, _dynamoDbWriterMock.Object, _loggerMock.Object);
 
-            await function.FunctionHandler(evnt, _context);
+            await function.MoviesFunctionHandler(evnt, _context);
 
             var testLogger = _context.Logger as TestLambdaLogger;
             Assert.Contains("Stream processing complete", testLogger.Buffer.ToString());

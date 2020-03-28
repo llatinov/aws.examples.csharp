@@ -4,9 +4,9 @@ source ./configure-environment.sh
 timeout=30
 lambdasZipFile=DynamoDbLambdas/src/DynamoDbLambdas/bin/Release/netcoreapp2.1/DynamoDbLambdas.zip
 actorsLambda=ActorsLambdaFunction
-actorsHandler=DynamoDbLambdas::DynamoDbLambdas.ActorsFunction::FunctionHandler
+actorsHandler=DynamoDbLambdas::DynamoDbLambdas.ActorsFunction::ActorsFunctionHandler
 moviesLambda=MoviesLambdaFunction
-moviesHandler=DynamoDbLambdas::DynamoDbLambdas.MoviesFunction::FunctionHandler
+moviesHandler=DynamoDbLambdas::DynamoDbLambdas.MoviesFunction::MoviesFunctionHandler
 
 actorsStreamArn=$(aws dynamodb describe-table --table-name $actorsTable | jq -r ".Table | select(.TableName==\"$actorsTable\") | .LatestStreamArn")
 if [ "$actorsStreamArn" = "" ]

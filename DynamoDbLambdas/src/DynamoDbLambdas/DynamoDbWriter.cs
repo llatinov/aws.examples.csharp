@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Threading.Tasks;
 using Amazon;
@@ -32,13 +33,14 @@ namespace DynamoDbLambdas
 
         public async Task PutLogEntryAsync(LogEntry logEntry)
         {
+            var dateTime = logEntry.DateTime.ToString(CultureInfo.InvariantCulture);
             var request = new PutItemRequest
             {
                 TableName = "LogEntries",
                 Item = new Dictionary<string, AttributeValue>
                 {
                     {"Message", new AttributeValue {S = logEntry.Message}},
-                    {"DateTime", new AttributeValue {S = logEntry.ToString()}}
+                    {"DateTime", new AttributeValue {S = dateTime}}
                 }
             };
 

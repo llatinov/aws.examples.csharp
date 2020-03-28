@@ -270,51 +270,6 @@
 			"response": []
 		},
 		{
-			"name": "ServerlessActorsLocal",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"name": "Content-Type",
-						"type": "text",
-						"value": "application/json"
-					},
-					{
-						"key": "Authorization",
-						"type": "text",
-						"value": "Bearer validToken"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"FirstName\": \"Bruce\",\n    \"LastName\": \"Willis\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:4567/restapis/CHANGE_ME/local/_user_request_/actors/search",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4567",
-					"path": [
-						"restapis",
-						"CHANGE_ME",
-						"local",
-						"_user_request_",
-						"actors",
-						"search"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "ServerlessMovies",
 			"request": {
 				"method": "GET",
@@ -331,31 +286,6 @@
 					],
 					"path": [
 						"dev",
-						"movies",
-						"title",
-						"Die Hard"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "ServerlessMoviesLocal",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:4567/restapis/CHANGE_ME/local/_user_request_/movies/title/Die Hard",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "4567",
-					"path": [
-						"restapis",
-						"CHANGE_ME",
-						"local",
-						"_user_request_",
 						"movies",
 						"title",
 						"Die Hard"
